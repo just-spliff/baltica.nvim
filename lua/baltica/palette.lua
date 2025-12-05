@@ -1,42 +1,46 @@
 local M = {}
 
 M.colors = {
-	-- TŁO: "Baltic Petrol" (#031E26                           )
-	-- Gęsta, ciemna woda. Połączenie głębokiej zieleni i granatu.
-	void_main = "#031E26",
-	void_darker = "#01141a", -- Gutter/Panel boczny
-	void_float = "#06262e", -- Pływające okna (nieco jaśniejsze)
+	-- BACKGROUND: "Deepest Baltic"
+	-- Bardzo ciemny, zmatowiony turkus. To nie jest czerń. To kolor głębiny.
+	bg_main = "#01161B",
+	bg_float = "#031E24", -- Pływające okna (nieco jaśniejsze)
+	bg_gutter = "#01161B",
+	bg_visual = "#10333B", -- Eleganckie zaznaczenie
 
-	-- UI: Elementy techniczne
-	sonar_grey = "#456a70", -- Numery linii, komentarze (szaro-morskie)
-	glass_frame = "#1c4e5e", -- Ramki, podziały okien
+	-- UI: "Submerged Metal"
+	-- Kolory interfejsu są ciemne, by nie odciągać uwagi od kodu.
+	ui_border = "#1D454E",
+	ui_line_nr = "#365961",
+	ui_cursor = "#2EEAEB", -- Kursor świeci jak sonar
 
-	-- TEKST: "Ghost Light"
-	-- Złamana biel wpadająca w błękit.
-	ghost_white = "#d1e8ee",
-	ghost_dim = "#567a80", -- Przygaszone elementy
+	-- FOREGROUND: "Sea Foam"
+	-- Złamana biel, lekko zimna.
+	fg_main = "#C5DDE6",
+	fg_dim = "#5F8791", -- Komentarze (idealnie wtopione)
 
-	-- THE TRIAD (Główne kolory składni)
+	-- THE PALETTE (Starannie dobrana saturacja)
 
-	-- 1. BURSZTYN (Data/Value)
-	-- Ciepły, mocny pomarańcz. Kontrastuje z zimnym tłem (Teal & Orange).
-	amber_core = "#ffae00", -- Stringi
-	amber_glow = "#ffcc00", -- Jasny akcent
-	amber_glass = "#e09100", -- Liczby
+	-- AMBER (The Soul) - Dane
+	-- Używamy gradientu: od głębokiego miodu do jasnego złota.
+	amber_dark = "#D48F00", -- Liczby, Boolean (Ciężki bursztyn)
+	amber_bright = "#FFB62E", -- Stringi (Świecący bursztyn)
 
-	-- 2. BIOLUMINESCENCJA (Action/Life)
-	-- Neonowa zieleń i cyjan. To, co "działa".
-	bio_venom = "#00ff9d", -- Funkcje
-	bio_electric = "#00f0ff", -- Typy, Klasy
+	-- PHOSPHOR (The Life) - Logika
+	-- Toksyczna, ale czytelna zieleń/cyjan.
+	cyan_neon = "#2EEAEB", -- Typy, Konstruktory
+	green_bio = "#41EB96", -- Funkcje, Metody (Musi być wyraźne)
 
-	-- 3. LÓD (Structure/Flow)
-	-- Słowa kluczowe. Chłodne, by nie rozpraszały.
-	ice_blue = "#6dc7d1", -- if, else, return
+	-- ABYSSAL BLUE (The Structure)
+	-- To jest klucz do "Premium". Słowa kluczowe nie są jaskrawe.
+	-- Są w kolorze wody, by tworzyć tło dla danych.
+	blue_haze = "#569CA8", -- Keywords (if, else, return)
+	blue_deep = "#2A6E7D", -- Operatory, Interpunkcja
 
-	-- ALERTY I STATUSY
-	rust_blood = "#ff5544", -- Error / Delete
-	warning_beam = "#e6b450", -- Warning / Change
-	selection_glaze = "#0f4552", -- Visual Selection
+	-- ALERTS
+	error = "#FF5D62", -- Koral (Soft Red)
+	warning = "#E6B450",
+	info = "#2EEAEB",
 
 	none = "NONE",
 }
