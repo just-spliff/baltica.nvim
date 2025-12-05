@@ -1,7 +1,7 @@
 local M = {}
 
 function M.setup(config)
-	local c = require("ba  ltica.palette").colors
+	local c = require("baltica.palette").colors
 	local opts = config.options
 
 	local bg = opts.transparent_background and c.none or c.void_main
