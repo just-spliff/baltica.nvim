@@ -4,88 +4,97 @@ function M.setup(config)
 	local c = require("baltica.palette").colors
 	local opts = config.options
 
-	-- Obsługa przezroczystości
-	local bg = opts.transparent_background and c.none or c.abyss
-	local bg_ui = opts.transparent_background and c.none or c.abyss_layer
+	local bg = opts.transparent_background and c.none or c.void_main
+	local bg_float = opts.transparent_background and c.none or c.void_float
 
 	local groups = {
-		-- --- UI: ZANURZENIE ---
-		Normal = { fg = c.foam_white, bg = bg }, -- Zwykły tekst to piana
-		NormalFloat = { fg = c.foam_white, bg = bg_ui },
-		FloatBorder = { fg = c.electric_cyan, bg = bg_ui }, -- Ramki świecą jak neon
+		-- --- ATMOSPHERE (UI) ---
+		Normal = { fg = c.ghost_white, bg = bg },
+		NormalFloat = { fg = c.ghost_white, bg = bg_float },
+		FloatBorder = { fg = c.glass_frame, bg = bg_float },
 
-		-- Interfejs w kolorach głębinowych
-		CursorLine = { bg = c.abyss_layer },
-		CursorLineNr = { fg = c.electric_cyan, bold = true },
-		LineNr = { fg = c.sea_shadow },
+		-- Interfejs ma być subtelny, techniczny
+		Cursor = { fg = c.void_main, bg = c.bio_venom }, -- Kursor to sonar
+		CursorLine = { bg = c.void_float },
+		CursorLineNr = { fg = c.bio_venom, bold = true },
+		LineNr = { fg = c.sonar_grey },
 		SignColumn = { bg = bg },
-		VertSplit = { fg = c.abyss_highlight, bg = c.none },
+		VertSplit = { fg = c.void_darker, bg = c.void_darker }, -- Ciemna szczelina zamiast kreski
 
-		-- Selekcja to nie szare tło. To rozjaśniona woda.
-		Visual = { bg = c.abyss_highlight },
+		Visual = { bg = c.selection_glaze }, -- Zanurzenie w głębszej wodzie
+		Search = { fg = c.void_main, bg = c.amber_core }, -- Znalezienie bursztynu
 
-		-- Wyszukiwanie to światło latarki w wodzie
-		Search = { fg = c.abyss, bg = c.plankton_green },
-		IncSearch = { fg = c.abyss, bg = c.electric_cyan },
+		Pmenu = { fg = c.ghost_white, bg = c.void_float },
+		PmenuSel = { fg = c.void_main, bg = c.bio_venom, bold = true },
 
-		-- --- SEMANTYKA (THE LOGIC) ---
+		-- --- THE STORY (Syntax) ---
 
-		-- KOMENTARZE: Ciche, w tle.
-		Comment = { fg = c.sea_shadow, italic = opts.italics.comments },
+		-- 1. TŁO OPOWIEŚCI (Struktura, Komentarze, Słowa Kluczowe)
+		-- To wszystko jest zimne, wycofane. Buduje klimat, ale nie krzyczy.
+		Comment = { fg = c.ghost_dim, italic = true },
+		Delimiter = { fg = c.sonar_grey }, -- Nawiasy prawie znikają
+		Operator = { fg = c.ice_blue }, -- =, +, -
 
-		-- 1. STRUKTURA = WODA (Cyjany i Błękity)
-		-- Wszystko co steruje kodem należy do żywiołu wody.
-		Statement = { fg = c.electric_cyan, bold = true }, -- if, else, return, for
-		Conditional = { fg = c.electric_cyan, bold = true },
-		Repeat = { fg = c.electric_cyan, bold = true },
-		Operator = { fg = c.electric_cyan }, -- =, +, -, =>
-		Keyword = { fg = c.electric_cyan, italic = opts.italics.keywords },
-		Type = { fg = c.deep_current, bold = true }, -- int, string, void
-		Include = { fg = c.deep_current }, -- import, include
-		Delimiter = { fg = c.sea_shadow }, -- (), {}, [] (mało widoczne, jak dno)
+		-- UWAGA: Słowa kluczowe są ZIMNE. To największa zmiana.
+		-- Zamiast czerwonego `if`, masz lodowaty błękit.
+		Keyword = { fg = c.ice_blue, italic = opts.italics.keywords },
+		Statement = { fg = c.ice_blue },
+		Conditional = { fg = c.ice_blue },
+		Repeat = { fg = c.ice_blue },
+		Include = { fg = c.ice_blue },
 
-		-- 2. DANE = BURSZTYN (Ciepłe Złoto/Pomarańcz)
-		-- Tylko dane mają ciepły kolor. To sprawia, że stringi "wyskakują" z ekranu.
-		String = { fg = c.burning_amber, italic = opts.italics.strings },
-		Character = { fg = c.burning_amber },
-		Number = { fg = c.ancient_gold },
-		Boolean = { fg = c.ancient_gold, bold = true },
-		Constant = { fg = c.ancient_gold },
+		-- 2. ŻYCIE (Funkcje, Klasy, Typy)
+		-- To co "działa". Neonowa zieleń i cyjan.
+		Function = { fg = c.bio_venom, bold = true, shadow = true }, -- GLOW EFFECT (symulowany boldem)
+		Method = { fg = c.bio_venom, bold = true },
+		Type = { fg = c.bio_electric }, -- Klasy, Interface'y
+		Structure = { fg = c.bio_electric },
+		Constructor = { fg = c.bio_electric },
 
-		-- 3. AKCJA = FOSFORESCENCJA (Neonowa Zieleń)
-		-- To co "robi" rzeczy.
-		Function = { fg = c.plankton_green, bold = opts.bold.functions },
-		Identifier = { fg = c.foam_white }, -- Zmienne są neutralne (jak piana/woda)
+		-- 3. SKARB (Dane)
+		-- Bursztyn. To ma przyciągać wzrok.
+		String = { fg = c.amber_core, italic = opts.italics.strings },
+		Character = { fg = c.amber_core },
+		Number = { fg = c.amber_glass },
+		Boolean = { fg = c.amber_core, bold = true },
+		Constant = { fg = c.amber_core },
+
+		-- ZMIENNE (Neutralne)
+		Identifier = { fg = c.ghost_white }, -- Zmienne są po prostu duchem
 
 		-- SPECJALNE
-		PreProc = { fg = c.jellyfish_sting }, -- Dekoratory, makra
-		Special = { fg = c.jellyfish_sting },
+		Special = { fg = c.bio_electric },
+		PreProc = { fg = c.glass_frame }, -- Preprocesory ciemne, techniczne
 
-		-- --- TREESITTER (Dla precyzji) ---
-		["@variable"] = { fg = c.foam_white }, -- Czystość czytania
-		["@variable.builtin"] = { fg = c.electric_cyan, italic = true }, -- this, self
-		["@property"] = { fg = c.foam_white }, -- object properties
+		-- --- TREESITTER REFINEMENTS ---
+		["@variable"] = { fg = c.ghost_white },
+		["@variable.builtin"] = { fg = c.ice_blue }, -- this, self
+		["@variable.parameter"] = { fg = c.amber_glass }, -- parametry w funkcji są lekko bursztynowe
 
-		["@function"] = { fg = c.plankton_green, bold = opts.bold.functions },
-		["@function.builtin"] = { fg = c.plankton_green },
-		["@method"] = { fg = c.plankton_green },
+		["@function"] = { fg = c.bio_venom, bold = true },
+		["@function.builtin"] = { fg = c.bio_electric },
 
-		["@keyword"] = { fg = c.electric_cyan },
-		["@operator"] = { fg = c.electric_cyan },
+		["@keyword"] = { fg = c.ice_blue },
+		["@keyword.function"] = { fg = c.ice_blue }, -- `function` keyword
+		["@keyword.return"] = { fg = c.rust_blood, bold = true }, -- WYJĄTEK: Return jest ważny, więc czerwony
 
-		["@string"] = { fg = c.burning_amber },
-		["@number"] = { fg = c.ancient_gold },
+		["@type.builtin"] = { fg = c.bio_electric },
 
-		-- HTML/REACT TAGS:
-		-- Tagi nie są czerwone. Są elementem struktury (Woda/Cyjan).
-		["@tag"] = { fg = c.deep_current },
-		["@tag.attribute"] = { fg = c.plankton_green }, -- atrybuty to akcja
-		["@tag.delimiter"] = { fg = c.sea_shadow },
+		-- TAGI (HTML/JSX) - Struktura szklana, atrybuty zimne
+		["@tag"] = { fg = c.ice_blue },
+		["@tag.attribute"] = { fg = c.ghost_dim }, -- Atrybuty wycofane
+		["@tag.delimiter"] = { fg = c.sonar_grey },
 
 		-- DIAGNOSTYKA
-		DiagnosticError = { fg = c.jellyfish_sting },
-		DiagnosticWarn = { fg = c.rust_warning },
-		DiagnosticInfo = { fg = c.electric_cyan },
+		DiagnosticError = { fg = c.rust_blood },
+		DiagnosticWarn = { fg = c.warning_beam },
+		DiagnosticInfo = { fg = c.bio_electric },
+		DiagnosticHint = { fg = c.ghost_dim },
+
+		-- GIT (Minimalistyczny)
+		GitSignsAdd = { fg = c.bio_venom },
+		GitSignsChange = { fg = c.amber_glass },
+		GitSignsDelete = { fg = c.rust_blood },
 	}
 
 	for group, parameters in pairs(groups) do
