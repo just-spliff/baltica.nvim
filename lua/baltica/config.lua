@@ -1,10 +1,10 @@
 local M = {}
 
 M.defaults = {
-	-- Przełącznik przezroczystości
+	-- Czy tło ma być przezroczyste?
 	transparent_background = false,
 
-	-- Kontrola stylów tekstu
+	-- Style czcionek
 	italics = {
 		comments = true,
 		keywords = true,
@@ -16,13 +16,6 @@ M.defaults = {
 		functions = true,
 		keywords = false,
 		types = true,
-	},
-
-	-- Opcjonalnie: integracje z pluginami (można rozszerzać w przyszłości)
-	plugins = {
-		gitsigns = true,
-		treesitter = true,
-		nvimtree = true,
 	},
 }
 
