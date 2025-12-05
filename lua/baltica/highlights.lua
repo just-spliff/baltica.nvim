@@ -8,88 +8,104 @@ function M.setup(config)
 	local bg_float = opts.transparent_background and c.none or c.bg_float
 
 	local groups = {
-		-- --- UI: CINEMATIC DARKNESS ---
+		-- --- UI: DEEP IMMERSION ---
 		Normal = { fg = c.fg_main, bg = bg },
 		NormalNC = { fg = c.fg_main, bg = bg },
 		NormalFloat = { fg = c.fg_main, bg = bg_float },
 		FloatBorder = { fg = c.ui_border, bg = bg_float },
 
+		-- Kursor i linia: Bardzo subtelne
 		Cursor = { fg = c.bg_main, bg = c.ui_cursor },
 		CursorLine = { bg = c.bg_float },
 		CursorLineNr = { fg = c.cyan_neon, bold = true },
-		LineNr = { fg = c.ui_line_nr },
+		LineNr = { fg = c.ui_line_nr }, -- Ciemny, zgaszony kolor
 
 		SignColumn = { bg = bg },
 		VertSplit = { fg = c.ui_border, bg = c.none },
 		WinSeparator = { fg = c.ui_border, bg = c.none },
 
+		-- Wyszukiwanie: Kontrastowe, ale eleganckie
 		Visual = { bg = c.bg_visual },
 		Search = { fg = c.bg_main, bg = c.amber_bright, bold = true },
 		IncSearch = { fg = c.bg_main, bg = c.cyan_neon },
 
-		Pmenu = { fg = c.fg_main, bg = c.bg_float },
-		PmenuSel = { fg = c.bg_main, bg = c.green_bio, bold = true },
-		PmenuSbar = { bg = c.bg_float },
-		PmenuThumb = { bg = c.ui_border },
+		Pmenu = { fg = c.fg_dim, bg = c.bg_float }, -- Menu nieaktywne jest przygaszone
+		PmenuSel = { fg = c.bg_main, bg = c.green_bio, bold = true }, -- Aktywne świeci
 
-		-- --- SEMANTICS: THE HIERARCHY ---
+		-- --- HIERARCHIA KODU (THE CLEANUP) ---
 
-		-- LEVEL 1: BACKGROUND NOISE (Structure)
-		-- Nawiasy, przecinki, średniki - ciemne, prawie niewidoczne.
-		Delimiter = { fg = c.blue_deep },
-		Operator = { fg = c.blue_deep }, -- =, +, -
-		Comment = { fg = c.fg_dim, italic = opts.italics.comments },
+		-- 1. WARSTWA NIEWIDZIALNA (Noise Reduction)
+		-- To jest ta zmiana, o którą prosiłeś.
+		-- Operatory, kropki, średniki, nawiasy są w kolorze 'sonar_grey' lub 'blue_deep'.
+		-- Są ciemniejsze niż główny tekst. Nie wybijają się.
+		Comment = { fg = c.ui_line_nr, italic = opts.italics.comments }, -- Komentarze bardzo ciemne
+		Delimiter = { fg = c.ui_line_nr }, -- () {} [] - ciemne, prawie jak tło
+		Operator = { fg = c.blue_deep }, -- = + - * : ? - ciemny morski, nie świeci!
+		Punctuation = { fg = c.ui_line_nr }, -- . , ;
 
-		-- LEVEL 2: THE FLOW (Keywords)
-		-- Słowa kluczowe są częścią "wody". Nie krzyczą.
+		-- 2. WARSTWA WODY (Structure)
+		-- Słowa kluczowe. Widoczne, ale chłodne i spokojne.
 		Keyword = { fg = c.blue_haze, italic = opts.italics.keywords },
-		Statement = { fg = c.blue_haze },
+		Statement = { fg = c.blue_haze }, -- if, else
 		Conditional = { fg = c.blue_haze },
-		Repeat = { fg = c.blue_haze },
+		Repeat = { fg = c.blue_haze }, -- for, while
+		Exception = { fg = c.error }, -- try, catch (wyjątek: błędy widać)
+		Include = { fg = c.blue_haze }, -- import
 
-		-- LEVEL 3: THE OBJECTS (Variables)
-		-- Czysta b       iel/piana.
+		-- 3. WARSTWA PIANY (Content)
+		-- Zmienne. Czysta, jasna biel.
 		Identifier = { fg = c.fg_main },
 
-		-- LEVEL 4: THE LIFE (Functions & Types)
-		-- To co działa. Neon.
+		-- 4. WARSTWA ŻYCIA (Action)
+		-- Funkcje. Neonowa zieleń. To one napędzają kod.
 		Function = { fg = c.green_bio, bold = opts.bold.functions },
 		Method = { fg = c.green_bio, bold = opts.bold.functions },
-		Type = { fg = c.cyan_neon, bold = opts.bold.types },
-		Structure = { fg = c.cyan_neon },
 
-		-- LEVEL 5: THE TREASURE (Data)
-		-- Najjaśniejszy punkt ekranu. Bursztyn.
+		-- 5. WARSTWA SKARBU (Data)
+		-- Bursztyn. Najjaśniejszy punkt.
 		String = { fg = c.amber_bright, italic = opts.italics.strings },
 		Number = { fg = c.amber_dark },
 		Boolean = { fg = c.amber_dark, bold = true },
 		Constant = { fg = c.amber_dark },
 
-		-- --- SPECIALS & PLUGINS ---
-		Special = { fg = c.cyan_neon },
-		PreProc = { fg = c.blue_haze },
+		-- Typy i Klasy (Neonowy Cyjan - Technologia)
+		Type = { fg = c.cyan_neon, bold = opts.bold.types },
+		Structure = { fg = c.cyan_neon }, -- interface, struct
+		Constructor = { fg = c.cyan_neon },
 
-		-- HTML / JSX (Kluczowe dla Fullstacka)
-		-- Tagi są strukturą (Woda), Atrybuty są właściwościami (Piana)
-		["@tag"] = { fg = c.blue_haze },
-		["@tag.attribute"] = { fg = c.fg_main, italic = true },
-		["@tag.delimiter"] = { fg = c.blue_deep },
+		-- --- TREESITTER (PRECYZJA) ---
 
-		-- JSON
-		["@property.json"] = { fg = c.cyan_neon }, -- Klucze w JSON świecą
+		-- Wyciemnianie interpunkcji w Treesitterze (Kluczowe!)
+		["@punctuation.delimiter"] = { fg = c.ui_line_nr }, -- , ; .
+		["@punctuation.bracket"] = { fg = c.ui_line_nr }, -- () {} []
+		["@operator"] = { fg = c.blue_deep }, -- === !== || &&
 
-		-- TREESITTER REFINEMENTS
-		["@variable.builtin"] = { fg = c.cyan_neon, italic = true }, -- this, self
-		["@constructor"] = { fg = c.cyan_neon },
-		["@keyword.return"] = { fg = c.error, bold = true }, -- Return musi być widoczny
+		-- Zmienne i Parametry
+		["@variable"] = { fg = c.fg_main },
+		["@variable.builtin"] = { fg = c.cyan_neon, italic = true }, -- this
+		["@parameter"] = { fg = c.fg_main, italic = true }, -- parametry odróżniamy tylko kursywą
+		["@property"] = { fg = c.fg_main }, -- w JS obj.prop - prop jest biały (czystość)
 
-		-- DIAGNOSTICS
+		-- HTML / JSX / TSX
+		-- Tagi: Struktura (Woda), Atrybuty: Przygaszone, Znaki: Ciemne
+		["@tag"] = { fg = c.blue_haze }, -- <div
+		["@tag.attribute"] = { fg = c.fg_dim, italic = true }, -- className (szare, nieistotne)
+		["@tag.delimiter"] = { fg = c.ui_line_nr }, -- > (ciemne!)
+
+		-- JSON (Tu klucze są ważne, więc cyjan)
+		["@property.json"] = { fg = c.cyan_neon },
+
+		-- Markdown (Dokumentacja)
+		["@text.literal"] = { fg = c.amber_bright }, -- code blocks
+		["@text.strong"] = { bold = true },
+		["@text.emphasis"] = { italic = true },
+
+		-- DIAGNOSTICS & GIT
 		DiagnosticError = { fg = c.error },
 		DiagnosticWarn = { fg = c.warning },
 		DiagnosticInfo = { fg = c.info },
-		DiagnosticHint = { fg = c.fg_dim },
+		DiagnosticHint = { fg = c.ui_line_nr },
 
-		-- GIT
 		GitSignsAdd = { fg = c.green_bio },
 		GitSignsChange = { fg = c.warning },
 		GitSignsDelete = { fg = c.error },
