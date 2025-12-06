@@ -4,12 +4,16 @@ function M.setup(config)
 	local c = require("baltica.palette").colors
 	local opts = config.options
 
+	-- 1. LOGIKA TŁA (The Source of Truth)
 	local transparent = opts.transparent_background
 
+	-- Tło edytora
 	local bg = transparent and c.none or c.bg_main
 	local bg_float = transparent and c.none or c.bg_float
 
-	local bg_bufferline = transparent and c.none or "#01161B"
+	-- Tło Bufferline (KLUCZOWA ZMIANA)
+	-- Używamy surowego stringa "NONE" dla pewności w trybie transparent
+	local bg_bufferline = transparent and "NONE" or "#01161B"
 
 	local groups = {
 		-- --- UI ---
@@ -89,26 +93,27 @@ function M.setup(config)
 		GitSignsDelete = { fg = c.error },
 
 		-- =========================================================
-		-- BUFFERLINE: TRANSPARENT FIX
+		-- BUFFERLINE: TRANSPARENT & SEAMLESS FIX
 		-- =========================================================
-		-- Wszystkie tła ustawiamy na 'bg_bufferline'.
 
-		-- 1. FILL (Tło paska)
+		-- 1. FILL (Puste miejsce) - MUSI być bg_bufferline ("NONE" lub "#01161B")
 		BufferLineFill = { bg = bg_bufferline },
 
 		-- 2. KARTA NIEAKTYWNA
 		BufferLineBackground = { fg = c.ui_line_nr, bg = bg_bufferline },
 
-		-- 3. KARTA AKTYWNA (Wyróżniamy tekstem)
+		-- 3. KARTA AKTYWNA
+		-- W trybie transparent: tekst wisi w powietrzu (bg=NONE).
+		-- W trybie solid: tekst na ciemnym tle (bg=#01161B).
 		BufferLineBufferSelected = { fg = c.fg_main, bg = bg_bufferline, bold = true },
 		BufferLineBufferVisible = { fg = c.fg_dim, bg = bg_bufferline },
 
-		-- 4. SEPARATORY (Znikają w tle)
+		-- 4. SEPARATORY (Znikają)
 		BufferLineSeparator = { fg = bg_bufferline, bg = bg_bufferline },
 		BufferLineSeparatorSelected = { fg = bg_bufferline, bg = bg_bufferline },
 		BufferLineSeparatorVisible = { fg = bg_bufferline, bg = bg_bufferline },
 
-		-- 5. WSKAŹNIK
+		-- 5. WSKAŹNIK (Bursztyn)
 		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = bg_bufferline },
 		BufferLineIndicatorVisible = { fg = bg_bufferline, bg = bg_bufferline },
 
