@@ -109,50 +109,42 @@ function M.setup(config)
 		GitSignsAdd = { fg = c.green_bio },
 		GitSignsChange = { fg = c.warning },
 		GitSignsDelete = { fg = c.error },
-
 		BufferLineFill = { bg = bg },
 
-		-- Nieaktywne zakładki (Zanurzone)
-		BufferLineBackground = { fg = c.ui_line_nr, bg = bg },
+		-- Karta NIEAKTYWNA
+		-- Używamy 'bg_float'. Jeśli transparency=true, to też będzie NONE,
+		-- więc tekst będzie po prostu "wisiał" w powietrzu (bardzo nowoczesne).
+		BufferLineBackground = { fg = c.fg_dim, bg = bg_float },
 
-		-- Aktywna zakładka (Wynurzona, jaśniejsza)
-		BufferLineBufferSelected = { fg = c.fg_main, bg = bg_float, bold = true, italic = false },
+		-- Karta AKTYWNA
+		-- Ma to samo tło co edytor (bg), więc wizualnie "łączy się" z kodem poniżej.
+		BufferLineBufferSelected = { fg = c.fg_main, bg = bg, bold = true, italic = false },
 
-		-- Separatory (Pionowe kreski)
-		-- Ustawiamy tak, aby zlewały się z tłem, dając efekt "pływających" napisów
-		BufferLineSeparator = { fg = bg, bg = bg },
-		BufferLineSeparatorSelected = { fg = bg, bg = bg_float },
+		-- Wskaźnik (Indicator) - Bursztyn
+		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = bg },
 
-		-- Wskaźnik (Pasek na górze/dole aktywnej karty)
-		BufferLineIndicatorSelected = { fg = c.cyan_neon, bg = bg_float },
+		-- Separatory (Kluczowe dla efektu "wycięcia")
+		-- Tło (bg) musi być 'bg' (głównym tłem), żeby zlewało się z Fill.
+		-- Foreground (fg) musi być 'bg_float', żeby stykało się z nieaktywną kartą.
+		BufferLineSeparator = { fg = bg_float, bg = bg },
+		BufferLineSeparatorSelected = { fg = bg_float, bg = bg },
 
-		-- Plik zmodyfikowany (Niezapisany) - Bursztyn
-		BufferLineModified = { fg = c.amber_dark, bg = bg },
-		BufferLineModifiedSelected = { fg = c.amber_bright, bg = bg_float },
+		-- Przycisk zamknięcia
+		BufferLineCloseButton = { fg = c.fg_dim, bg = bg_float },
+		BufferLineCloseButtonSelected = { fg = c.error, bg = bg },
 
-		-- Ikony błędów/diagnostyki w zakładkach
-		BufferLineError = { fg = c.error, bg = bg },
-		BufferLineErrorSelected = { fg = c.error, bg = bg_float },
-		BufferLineWarning = { fg = c.warning, bg = bg },
-		BufferLineWarningSelected = { fg = c.warning, bg = bg_float },
+		-- Modyfikacje pliku
+		BufferLineModified = { fg = c.amber_dark, bg = bg_float },
+		BufferLineModifiedSelected = { fg = c.amber_bright, bg = bg, bold = true },
 
-		-- --- PLUGIN: TELESCOPE (Przy okazji, bo też ważne) ---
-		TelescopeNormal = { fg = c.fg_main, bg = bg_float },
-		TelescopeBorder = { fg = c.ui_border, bg = bg_float },
-		TelescopePromptNormal = { fg = c.fg_main, bg = bg_float },
-		TelescopePromptBorder = { fg = c.cyan_neon, bg = bg_float }, -- Ramka wpisywania świeci
-		TelescopePromptTitle = { fg = c.bg_main, bg = c.cyan_neon, bold = true },
-		TelescopePreviewTitle = { fg = c.bg_main, bg = c.green_bio, bold = true },
-		TelescopeSelection = { bg = c.bg_visual, bold = true },
+		-- Diagnostyka
+		BufferLineError = { fg = c.fg_dim, bg = bg_float },
+		BufferLineErrorDiagnostic = { fg = c.error, bg = bg_float },
+		BufferLineErrorSelected = { fg = c.error, bg = bg, bold = true, italic = true },
 
-		-- --- PLUGIN: NVIM-TREE (File Explorer) ---
-		NvimTreeNormal = { fg = c.fg_main, bg = bg }, -- Tło jak w edytorze
-		NvimTreeWinSeparator = { fg = c.ui_border, bg = c.none },
-		NvimTreeFolderName = { fg = c.blue_haze, bold = true },
-		NvimTreeOpenedFolderName = { fg = c.cyan_neon, bold = true },
-		NvimTreeGitDirty = { fg = c.amber_bright },
-		NvimTreeGitNew = { fg = c.green_bio },
-		NvimTreeGitDeleted = { fg = c.error },
+		-- Opcjonalnie: Numery (jeśli używasz)
+		BufferLineNumbers = { fg = c.ui_line_nr, bg = bg_float },
+		BufferLineNumbersSelected = { fg = c.cyan_neon, bg = bg, bold = true },
 	}
 
 	for group, parameters in pairs(groups) do
