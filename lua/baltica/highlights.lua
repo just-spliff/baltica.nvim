@@ -2,15 +2,20 @@ local M = {}
 
 function M.setup(config)
 	local c = require("baltica.palette").colors
-	local opts = config.options
+	-- Zabezpieczenie: jeśli config.options jest puste, użyj domyślnych
+	local opts = config.options or { transparent_background = false, italics = {}, bold = {} }
 
-	-- Ustalanie głównego tła (Transparent vs Solid)
-	local bg = opts.transparent_background and c.none or c.bg_main
+	-- GŁÓWNA LOGIKA TŁA
+	-- Domyślnie bg_main (#01161B). Tylko jeśli explicit true -> NONE.
+	local bg = c.bg_main
+	if opts.transparent_background == true then
+		bg = c.none
+	end
+
 	local bg_float = opts.transparent_background and c.none or c.bg_float
 
-	-- 1. BAZOWE GRUPY (UI & Syntax)
 	local groups = {
-		-- UI
+		-- --- UI ---
 		Normal = { fg = c.fg_main, bg = bg },
 		NormalNC = { fg = c.fg_main, bg = bg },
 		NormalFloat = { fg = c.fg_main, bg = bg_float },
@@ -20,6 +25,7 @@ function M.setup(config)
 		CursorLine = { bg = c.bg_float },
 		CursorLineNr = { fg = c.cyan_neon, bold = true },
 		LineNr = { fg = c.ui_line_nr },
+
 		SignColumn = { bg = bg },
 		VertSplit = { fg = c.ui_border, bg = c.none },
 		WinSeparator = { fg = c.ui_border, bg = c.none },
@@ -33,7 +39,7 @@ function M.setup(config)
 		PmenuSbar = { bg = c.bg_float },
 		PmenuThumb = { bg = c.ui_border },
 
-		-- SEMANTICS (Cleanup)
+		-- --- HIERARCHIA KODU ---
 		Comment = { fg = c.ui_line_nr, italic = opts.italics.comments },
 		Delimiter = { fg = c.ui_line_nr },
 		Operator = { fg = c.blue_deep },
@@ -50,7 +56,6 @@ function M.setup(config)
 
 		Function = { fg = c.green_bio, bold = opts.bold.functions },
 		Method = { fg = c.green_bio, bold = opts.bold.functions },
-
 		Type = { fg = c.cyan_neon, bold = opts.bold.types },
 		Structure = { fg = c.cyan_neon },
 		Constructor = { fg = c.cyan_neon },
@@ -85,20 +90,46 @@ function M.setup(config)
 		GitSignsAdd = { fg = c.green_bio },
 		GitSignsChange = { fg = c.warning },
 		GitSignsDelete = { fg = c.error },
+
+		-- =========================================================
+		-- BUFFERLINE FIX
+		-- =========================================================
+		-- Używamy tutaj c.bg_main (HEX) bezpośrednio jako fallback,
+		-- jeśli zmienna 'bg' zawiodła. Ale używamy 'bg' jeśli działa.
+
+		-- TŁO
+		BufferLineFill = { fg = c.bg_main, bg = bg }, -- fg ustawione na tło by ukryć znaki
+		BufferLineBackground = { fg = c.ui_line_nr, bg = bg },
+
+		-- KARTA AKTYWNA
+		BufferLineBufferSelected = { fg = c.fg_main, bg = bg, bold = true },
+		BufferLineBufferVisible = { fg = c.fg_dim, bg = bg },
+
+		-- SEPARATORY
+		BufferLineSeparator = { fg = bg, bg = bg },
+		BufferLineSeparatorSelected = { fg = bg, bg = bg },
+		BufferLineSeparatorVisible = { fg = bg, bg = bg },
+
+		-- WSKAŹNIK
+		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = bg },
+		BufferLineIndicatorVisible = { fg = bg, bg = bg },
+
+		-- POZOSTAŁE
+		BufferLineCloseButton = { fg = c.ui_line_nr, bg = bg },
+		BufferLineCloseButtonSelected = { fg = c.error, bg = bg },
+		BufferLineModified = { fg = c.amber_dark, bg = bg },
+		BufferLineModifiedSelected = { fg = c.amber_bright, bg = bg, bold = true },
+
+		BufferLineError = { fg = c.error, bg = bg },
+		BufferLineErrorDiagnostic = { fg = c.error, bg = bg },
+
+		-- Tablice
+		BufferLineTab = { fg = c.ui_line_nr, bg = bg },
+		BufferLineTabSelected = { fg = c.fg_main, bg = bg },
+		BufferLineTabSeparator = { fg = bg, bg = bg },
+		BufferLineTabClose = { fg = c.error, bg = bg },
 	}
 
-	-- 2. INTEGRACJE (Tu ładujemy Bufferline)
-	-- Sprawdzamy, czy plik istnieje, by uniknąć błędów
-	local status_ok, bufferline_integration = pcall(require, "baltica.integrations.bufferline")
-	if status_ok then
-		local bufferline_groups = bufferline_integration.get(c, bg)
-		-- Łączymy tabele
-		for group, opts in pairs(bufferline_groups) do
-			groups[group] = opts
-		end
-	end
-
-	-- 3. APLIKOWANIE WSZYSTKIEGO
 	for group, parameters in pairs(groups) do
 		vim.api.nvim_set_hl(0, group, parameters)
 	end
