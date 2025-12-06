@@ -4,16 +4,17 @@ function M.setup(config)
 	local c = require("baltica.palette").colors
 	local opts = config.options
 
-	-- 1. LOGIKA TŁA (The Source of Truth)
-	local transparent = opts.transparent_background
+	-- 1. LOGIKA TŁA (Absolutna)
+	local is_transparent = opts.transparent_background
 
-	-- Tło edytora
-	local bg = transparent and c.none or c.bg_main
-	local bg_float = transparent and c.none or c.bg_float
+	-- Tło edytora: albo NONE albo Deep Petrol
+	local bg = is_transparent and "NONE" or c.bg_main
+	local bg_float = is_transparent and "NONE" or c.bg_float
 
-	-- Tło Bufferline (KLUCZOWA ZMIANA)
-	-- Używamy surowego stringa "NONE" dla pewności w trybie transparent
-	local bg_bufferline = transparent and "NONE" or "#01161B"
+	-- Tło Bufferline: KLUCZ DO SUKCESU
+	-- Wymuszamy string "NONE", jeśli włączona jest przezroczystość.
+	-- Dzięki temu bufferline na pewno odsłoni tapetę terminala.
+	local bg_bufferline = is_transparent and "NONE" or "#01161B"
 
 	local groups = {
 		-- --- UI ---
@@ -28,8 +29,8 @@ function M.setup(config)
 		LineNr = { fg = c.ui_line_nr },
 
 		SignColumn = { bg = bg },
-		VertSplit = { fg = c.ui_border, bg = c.none },
-		WinSeparator = { fg = c.ui_border, bg = c.none },
+		VertSplit = { fg = c.ui_border, bg = "NONE" },
+		WinSeparator = { fg = c.ui_border, bg = "NONE" },
 
 		Visual = { bg = c.bg_visual },
 		Search = { fg = c.bg_main, bg = c.amber_bright, bold = true },
@@ -54,7 +55,6 @@ function M.setup(config)
 		Exception = { fg = c.error },
 
 		Identifier = { fg = c.fg_main },
-
 		Function = { fg = c.green_bio, bold = opts.bold.functions },
 		Method = { fg = c.green_bio, bold = opts.bold.functions },
 		Type = { fg = c.cyan_neon, bold = opts.bold.types },
@@ -93,22 +93,22 @@ function M.setup(config)
 		GitSignsDelete = { fg = c.error },
 
 		-- =========================================================
-		-- BUFFERLINE: TRANSPARENT & SEAMLESS FIX
+		-- BUFFERLINE: TRANSPARENCY FIX
 		-- =========================================================
 
-		-- 1. FILL (Puste miejsce) - MUSI być bg_bufferline ("NONE" lub "#01161B")
+		-- 1. FILL (Tło paska)
+		-- To najważniejsza linia. bg_bufferline to albo "NONE" albo "#01161B".
 		BufferLineFill = { bg = bg_bufferline },
 
 		-- 2. KARTA NIEAKTYWNA
 		BufferLineBackground = { fg = c.ui_line_nr, bg = bg_bufferline },
 
 		-- 3. KARTA AKTYWNA
-		-- W trybie transparent: tekst wisi w powietrzu (bg=NONE).
-		-- W trybie solid: tekst na ciemnym tle (bg=#01161B).
+		-- Ma to samo tło co Fill (żeby była płaska/przezroczysta), wyróżnia się tekstem.
 		BufferLineBufferSelected = { fg = c.fg_main, bg = bg_bufferline, bold = true },
 		BufferLineBufferVisible = { fg = c.fg_dim, bg = bg_bufferline },
 
-		-- 4. SEPARATORY (Znikają)
+		-- 4. SEPARATORY (Znikają w tle)
 		BufferLineSeparator = { fg = bg_bufferline, bg = bg_bufferline },
 		BufferLineSeparatorSelected = { fg = bg_bufferline, bg = bg_bufferline },
 		BufferLineSeparatorVisible = { fg = bg_bufferline, bg = bg_bufferline },
