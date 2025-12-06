@@ -109,6 +109,50 @@ function M.setup(config)
 		GitSignsAdd = { fg = c.green_bio },
 		GitSignsChange = { fg = c.warning },
 		GitSignsDelete = { fg = c.error },
+
+		BufferLineFill = { bg = bg },
+
+		-- Nieaktywne zakładki (Zanurzone)
+		BufferLineBackground = { fg = c.ui_line_nr, bg = bg },
+
+		-- Aktywna zakładka (Wynurzona, jaśniejsza)
+		BufferLineBufferSelected = { fg = c.fg_main, bg = bg_float, bold = true, italic = false },
+
+		-- Separatory (Pionowe kreski)
+		-- Ustawiamy tak, aby zlewały się z tłem, dając efekt "pływających" napisów
+		BufferLineSeparator = { fg = bg, bg = bg },
+		BufferLineSeparatorSelected = { fg = bg, bg = bg_float },
+
+		-- Wskaźnik (Pasek na górze/dole aktywnej karty)
+		BufferLineIndicatorSelected = { fg = c.cyan_neon, bg = bg_float },
+
+		-- Plik zmodyfikowany (Niezapisany) - Bursztyn
+		BufferLineModified = { fg = c.amber_dark, bg = bg },
+		BufferLineModifiedSelected = { fg = c.amber_bright, bg = bg_float },
+
+		-- Ikony błędów/diagnostyki w zakładkach
+		BufferLineError = { fg = c.error, bg = bg },
+		BufferLineErrorSelected = { fg = c.error, bg = bg_float },
+		BufferLineWarning = { fg = c.warning, bg = bg },
+		BufferLineWarningSelected = { fg = c.warning, bg = bg_float },
+
+		-- --- PLUGIN: TELESCOPE (Przy okazji, bo też ważne) ---
+		TelescopeNormal = { fg = c.fg_main, bg = bg_float },
+		TelescopeBorder = { fg = c.ui_border, bg = bg_float },
+		TelescopePromptNormal = { fg = c.fg_main, bg = bg_float },
+		TelescopePromptBorder = { fg = c.cyan_neon, bg = bg_float }, -- Ramka wpisywania świeci
+		TelescopePromptTitle = { fg = c.bg_main, bg = c.cyan_neon, bold = true },
+		TelescopePreviewTitle = { fg = c.bg_main, bg = c.green_bio, bold = true },
+		TelescopeSelection = { bg = c.bg_visual, bold = true },
+
+		-- --- PLUGIN: NVIM-TREE (File Explorer) ---
+		NvimTreeNormal = { fg = c.fg_main, bg = bg }, -- Tło jak w edytorze
+		NvimTreeWinSeparator = { fg = c.ui_border, bg = c.none },
+		NvimTreeFolderName = { fg = c.blue_haze, bold = true },
+		NvimTreeOpenedFolderName = { fg = c.cyan_neon, bold = true },
+		NvimTreeGitDirty = { fg = c.amber_bright },
+		NvimTreeGitNew = { fg = c.green_bio },
+		NvimTreeGitDeleted = { fg = c.error },
 	}
 
 	for group, parameters in pairs(groups) do
