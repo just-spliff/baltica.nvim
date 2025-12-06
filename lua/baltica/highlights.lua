@@ -1,83 +1,94 @@
 local M = {}
 
 function M.setup(c, config)
+	-- LOGIKA TŁA
 	local transparent = config.transparent_background
-	local bg = transparent and c.none or c.bg_main
-	local bg_float = transparent and c.none or c.bg_float
 
-	-- Jeśli transparent, to Bufferline ma tło NONE. Jeśli nie, to Deep Petrol.
-	local bg_bar = transparent and c.none or c.bg_main
+	-- Jeśli transparent=true, tło to string "NONE".
+	-- Jeśli false, tło to Deep Petrol (#01161B).
+	local bg = transparent and "NONE" or c.bg_main
+	local bg_float = transparent and "NONE" or c.bg_float
+	local bg_bar = transparent and "NONE" or c.bg_main
 
-	local groups = {
-		-- UI BASE
-		Normal = { fg = c.fg_main, bg = bg },
-		NormalNC = { fg = c.fg_main, bg = bg },
-		NormalFloat = { fg = c.fg_main, bg = bg_float },
-		FloatBorder = { fg = c.ui_border, bg = bg_float },
+	local theme = {}
+	local function hl(group, styles)
+		theme[group] = styles
+	end
 
-		Cursor = { fg = c.bg_main, bg = c.ui_cursor },
-		CursorLine = { bg = c.bg_float },
-		CursorLineNr = { fg = c.cyan_neon, bold = true },
-		LineNr = { fg = c.ui_line_nr },
+	-- --- UI BASE ---
+	hl("Normal", { fg = c.fg_main, bg = bg })
+	hl("NormalNC", { fg = c.fg_main, bg = bg })
+	hl("NormalFloat", { fg = c.fg_main, bg = bg_float })
+	hl("FloatBorder", { fg = c.ui_border, bg = bg_float })
 
-		SignColumn = { bg = bg },
-		VertSplit = { fg = c.ui_border, bg = c.none },
-		WinSeparator = { fg = c.ui_border, bg = c.none },
+	hl("Cursor", { fg = c.bg_main, bg = c.ui_cursor })
+	hl("CursorLine", { bg = c.bg_float })
+	hl("CursorLineNr", { fg = c.cyan_neon, bold = true })
+	hl("LineNr", { fg = c.ui_line_nr })
 
-		Visual = { bg = c.bg_visual },
-		Search = { fg = c.bg_main, bg = c.amber_bright, bold = true },
+	hl("SignColumn", { bg = bg })
+	hl("VertSplit", { fg = c.ui_border, bg = "NONE" })
+	hl("WinSeparator", { fg = c.ui_border, bg = "NONE" })
 
-		Pmenu = { fg = c.fg_dim, bg = c.bg_float },
-		PmenuSel = { fg = c.bg_main, bg = c.green_bio, bold = true },
+	hl("Visual", { bg = c.bg_visual })
+	hl("Search", { fg = c.bg_main, bg = c.amber_bright, bold = true })
 
-		-- SYNTAX
-		Comment = { fg = c.ui_line_nr, italic = config.italics.comments },
-		Delimiter = { fg = c.blue_deep },
-		Operator = { fg = c.blue_deep },
-		Keyword = { fg = c.blue_haze, italic = config.italics.keywords },
-		Statement = { fg = c.blue_haze },
-		Conditional = { fg = c.blue_haze },
-		Function = { fg = c.green_bio, bold = config.bold.functions },
-		Identifier = { fg = c.fg_main },
-		String = { fg = c.amber_bright, italic = config.italics.strings },
-		Number = { fg = c.amber_dark },
-		Type = { fg = c.cyan_neon, bold = config.bold.types },
-		Special = { fg = c.cyan_neon },
+	hl("Pmenu", { fg = c.fg_dim, bg = c.bg_float })
+	hl("PmenuSel", { fg = c.bg_main, bg = c.green_bio, bold = true })
+	hl("PmenuSbar", { bg = c.bg_float })
+	hl("PmenuThumb", { bg = c.ui_border })
 
-		-- TREESITTER
-		["@variable"] = { fg = c.fg_main },
-		["@punctuation.delimiter"] = { fg = c.ui_line_nr },
-		["@punctuation.bracket"] = { fg = c.ui_line_nr },
-		["@tag"] = { fg = c.blue_haze },
-		["@tag.attribute"] = { fg = c.fg_dim, italic = true },
-		["@tag.delimiter"] = { fg = c.ui_line_nr },
+	-- --- SYNTAX ---
+	hl("Comment", { fg = c.ui_line_nr, italic = config.italics.comments })
+	hl("Delimiter", { fg = c.blue_deep })
+	hl("Operator", { fg = c.blue_deep })
+	hl("Keyword", { fg = c.blue_haze, italic = config.italics.keywords })
+	hl("Statement", { fg = c.blue_haze })
+	hl("Conditional", { fg = c.blue_haze })
+	hl("Function", { fg = c.green_bio, bold = config.bold.functions })
+	hl("Identifier", { fg = c.fg_main })
+	hl("String", { fg = c.amber_bright, italic = config.italics.strings })
+	hl("Number", { fg = c.amber_dark })
+	hl("Type", { fg = c.cyan_neon, bold = config.bold.types })
+	hl("Special", { fg = c.cyan_neon })
 
-		BufferLineFill = { bg = bg_bar },
-		BufferLineBackground = { fg = c.ui_line_nr, bg = bg_bar },
+	-- --- TREESITTER ---
+	hl("@variable", { fg = c.fg_main })
+	hl("@tag", { fg = c.blue_haze })
+	hl("@tag.attribute", { fg = c.fg_dim, italic = true })
+	hl("@tag.delimiter", { fg = c.ui_line_nr })
+	hl("@punctuation.delimiter", { fg = c.ui_line_nr })
+	hl("@punctuation.bracket", { fg = c.ui_line_nr })
 
-		BufferLineBufferSelected = { fg = c.fg_main, bg = bg_bar, bold = true },
-		BufferLineBufferVisible = { fg = c.fg_dim, bg = bg_bar },
+	-- --- BUFFERLINE (Tokyonight Style) ---
+	-- Używamy bg_bar ("NONE" lub "#01161B") wszędzie
+	hl("BufferLineFill", { bg = bg_bar })
+	hl("BufferLineBackground", { fg = c.ui_line_nr, bg = bg_bar })
 
-		BufferLineSeparator = { fg = bg_bar, bg = bg_bar },
-		BufferLineSeparatorSelected = { fg = bg_bar, bg = bg_bar },
-		BufferLineSeparatorVisible = { fg = bg_bar, bg = bg_bar },
+	hl("BufferLineBufferSelected", { fg = c.fg_main, bg = bg_bar, bold = true })
+	hl("BufferLineBufferVisible", { fg = c.fg_dim, bg = bg_bar })
 
-		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = bg_bar },
-		BufferLineIndicatorVisible = { fg = bg_bar, bg = bg_bar },
+	hl("BufferLineSeparator", { fg = bg_bar, bg = bg_bar })
+	hl("BufferLineSeparatorSelected", { fg = bg_bar, bg = bg_bar })
+	hl("BufferLineSeparatorVisible", { fg = bg_bar, bg = bg_bar })
 
-		BufferLineCloseButton = { fg = c.ui_line_nr, bg = bg_bar },
-		BufferLineCloseButtonSelected = { fg = c.error, bg = bg_bar },
+	hl("BufferLineIndicatorSelected", { fg = c.amber_bright, bg = bg_bar })
+	hl("BufferLineIndicatorVisible", { fg = bg_bar, bg = bg_bar })
 
-		BufferLineModified = { fg = c.amber_dark, bg = bg_bar },
-		BufferLineModifiedSelected = { fg = c.amber_bright, bg = bg_bar, bold = true },
+	hl("BufferLineCloseButton", { fg = c.ui_line_nr, bg = bg_bar })
+	hl("BufferLineCloseButtonSelected", { fg = c.error, bg = bg_bar })
 
-		BufferLineError = { fg = c.error, bg = bg_bar },
-		BufferLineErrorDiagnostic = { fg = c.error, bg = bg_bar },
+	hl("BufferLineModified", { fg = c.amber_dark, bg = bg_bar })
+	hl("BufferLineModifiedSelected", { fg = c.amber_bright, bg = bg_bar, bold = true })
 
-		BufferLineOffsetSeparator = { fg = c.ui_border, bg = bg_bar },
-	}
+	hl("BufferLineError", { fg = c.error, bg = bg_bar })
+	hl("BufferLineErrorDiagnostic", { fg = c.error, bg = bg_bar })
+	hl("BufferLineWarning", { fg = c.warning, bg = bg_bar })
+	hl("BufferLineWarningDiagnostic", { fg = c.warning, bg = bg_bar })
 
-	return groups
+	hl("BufferLineOffsetSeparator", { fg = c.ui_border, bg = bg_bar })
+
+	return theme
 end
 
 return M
