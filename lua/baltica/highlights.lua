@@ -2,17 +2,15 @@ local M = {}
 
 function M.setup(config)
 	local c = require("baltica.palette").colors
-	-- Zabezpieczenie: jeśli config.options jest puste, użyj domyślnych
-	local opts = config.options or { transparent_background = false, italics = {}, bold = {} }
+	local opts = config.options
 
-	-- GŁÓWNA LOGIKA TŁA
-	-- Domyślnie bg_main (#01161B). Tylko jeśli explicit true -> NONE.
-	local bg = c.bg_main
-	if opts.transparent_background == true then
-		bg = c.none
-	end
-
+	-- Logika dla edytora (zostawiamy zmienną, bo działa dla reszty)
+	local bg = opts.transparent_background and c.none or c.bg_main
 	local bg_float = opts.transparent_background and c.none or c.bg_float
+
+	-- DEFINE HARDCODED BACKGROUND FOR BUFFERLINE
+	-- To jest ten kolor Deep Petrol. Wpisany na sztywno.
+	local hard_bg = "#01161B"
 
 	local groups = {
 		-- --- UI ---
@@ -36,10 +34,8 @@ function M.setup(config)
 
 		Pmenu = { fg = c.fg_dim, bg = c.bg_float },
 		PmenuSel = { fg = c.bg_main, bg = c.green_bio, bold = true },
-		PmenuSbar = { bg = c.bg_float },
-		PmenuThumb = { bg = c.ui_border },
 
-		-- --- HIERARCHIA KODU ---
+		-- --- SYNTAX ---
 		Comment = { fg = c.ui_line_nr, italic = opts.italics.comments },
 		Delimiter = { fg = c.ui_line_nr },
 		Operator = { fg = c.blue_deep },
@@ -92,42 +88,48 @@ function M.setup(config)
 		GitSignsDelete = { fg = c.error },
 
 		-- =========================================================
-		-- BUFFERLINE FIX
+		-- BUFFERLINE: HARDCODED FIX (#01161B)
 		-- =========================================================
-		-- Używamy tutaj c.bg_main (HEX) bezpośrednio jako fallback,
-		-- jeśli zmienna 'bg' zawiodła. Ale używamy 'bg' jeśli działa.
+		-- Używamy zmiennej 'hard_bg', która zawiera surowy HEX.
 
-		-- TŁO
-		BufferLineFill = { fg = c.bg_main, bg = bg }, -- fg ustawione na tło by ukryć znaki
-		BufferLineBackground = { fg = c.ui_line_nr, bg = bg },
+		-- 1. FILL (Tło paska)
+		BufferLineFill = { bg = hard_bg },
 
-		-- KARTA AKTYWNA
-		BufferLineBufferSelected = { fg = c.fg_main, bg = bg, bold = true },
-		BufferLineBufferVisible = { fg = c.fg_dim, bg = bg },
+		-- 2. KARTA NIEAKTYWNA
+		BufferLineBackground = { fg = c.ui_line_nr, bg = hard_bg },
 
-		-- SEPARATORY
-		BufferLineSeparator = { fg = bg, bg = bg },
-		BufferLineSeparatorSelected = { fg = bg, bg = bg },
-		BufferLineSeparatorVisible = { fg = bg, bg = bg },
+		-- 3. KARTA AKTYWNA
+		BufferLineBufferSelected = { fg = c.fg_main, bg = hard_bg, bold = true },
+		BufferLineBufferVisible = { fg = c.fg_dim, bg = hard_bg },
 
-		-- WSKAŹNIK
-		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = bg },
-		BufferLineIndicatorVisible = { fg = bg, bg = bg },
+		-- 4. SEPARATORY
+		BufferLineSeparator = { fg = hard_bg, bg = hard_bg },
+		BufferLineSeparatorSelected = { fg = hard_bg, bg = hard_bg },
+		BufferLineSeparatorVisible = { fg = hard_bg, bg = hard_bg },
 
-		-- POZOSTAŁE
-		BufferLineCloseButton = { fg = c.ui_line_nr, bg = bg },
-		BufferLineCloseButtonSelected = { fg = c.error, bg = bg },
-		BufferLineModified = { fg = c.amber_dark, bg = bg },
-		BufferLineModifiedSelected = { fg = c.amber_bright, bg = bg, bold = true },
+		-- 5. WSKAŹNIK
+		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = hard_bg },
+		BufferLineIndicatorVisible = { fg = hard_bg, bg = hard_bg },
 
-		BufferLineError = { fg = c.error, bg = bg },
-		BufferLineErrorDiagnostic = { fg = c.error, bg = bg },
+		-- 6. CLOSE ICONS
+		BufferLineCloseButton = { fg = c.ui_line_nr, bg = hard_bg },
+		BufferLineCloseButtonSelected = { fg = c.error, bg = hard_bg },
+		BufferLineCloseButtonVisible = { fg = c.ui_line_nr, bg = hard_bg },
 
-		-- Tablice
-		BufferLineTab = { fg = c.ui_line_nr, bg = bg },
-		BufferLineTabSelected = { fg = c.fg_main, bg = bg },
-		BufferLineTabSeparator = { fg = bg, bg = bg },
-		BufferLineTabClose = { fg = c.error, bg = bg },
+		-- 7. MODIFIED
+		BufferLineModified = { fg = c.amber_dark, bg = hard_bg },
+		BufferLineModifiedSelected = { fg = c.amber_bright, bg = hard_bg, bold = true },
+		BufferLineModifiedVisible = { fg = c.amber_dark, bg = hard_bg },
+
+		-- 8. DIAGNOSTICS
+		BufferLineError = { fg = c.error, bg = hard_bg },
+		BufferLineErrorDiagnostic = { fg = c.error, bg = hard_bg },
+		BufferLineWarning = { fg = c.warning, bg = hard_bg },
+		BufferLineWarningDiagnostic = { fg = c.warning, bg = hard_bg },
+
+		-- 9. PICK & OFFSET
+		BufferLinePick = { fg = c.error, bg = hard_bg, bold = true },
+		BufferLineOffsetSeparator = { fg = c.ui_border, bg = hard_bg },
 	}
 
 	for group, parameters in pairs(groups) do
