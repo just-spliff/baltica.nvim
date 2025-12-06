@@ -1,14 +1,10 @@
 local M = {}
 
 M.defaults = {
-	-- Czy tło ma być przezroczyste?
-	transparent_background = false,
-
-	-- Style czcionek
+	transparent_background = false, -- Domyślnie wyłączone
 	italics = {
 		comments = true,
 		keywords = true,
-		functions = false,
 		strings = false,
 		variables = false,
 	},
@@ -19,10 +15,10 @@ M.defaults = {
 	},
 }
 
-M.options = {}
+M.options = vim.deepcopy(M.defaults)
 
-function M.setup(user_opts)
-	M.options = vim.tbl_deep_extend("force", M.defaults, user_opts or {})
+function M.setup(options)
+	M.options = vim.tbl_deep_extend("force", M.defaults, options or {})
 end
 
 return M

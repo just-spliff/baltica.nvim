@@ -16,14 +16,12 @@ function M.load()
 	vim.o.termguicolors = true
 	vim.g.colors_name = "baltica"
 
-	-- Pobieramy kolory i opcje
+	-- Generujemy highlighty na podstawie AKTUALNEJ konfiguracji
 	local colors = M.palette.colors
 	local config = M.config.options
-
-	-- Generujemy highlighty
 	local groups = M.highlights.setup(colors, config)
 
-	-- Aplikujemy highlighty
+	-- Aplikujemy
 	for group, settings in pairs(groups) do
 		vim.api.nvim_set_hl(0, group, settings)
 	end
