@@ -4,168 +4,101 @@ function M.setup(config)
 	local c = require("baltica.palette").colors
 	local opts = config.options
 
+	-- Ustalanie głównego tła (Transparent vs Solid)
 	local bg = opts.transparent_background and c.none or c.bg_main
 	local bg_float = opts.transparent_background and c.none or c.bg_float
 
+	-- 1. BAZOWE GRUPY (UI & Syntax)
 	local groups = {
-		-- --- UI: DEEP IMMERSION ---
+		-- UI
 		Normal = { fg = c.fg_main, bg = bg },
 		NormalNC = { fg = c.fg_main, bg = bg },
 		NormalFloat = { fg = c.fg_main, bg = bg_float },
 		FloatBorder = { fg = c.ui_border, bg = bg_float },
 
-		-- Kursor i linia: Bardzo subtelne
 		Cursor = { fg = c.bg_main, bg = c.ui_cursor },
 		CursorLine = { bg = c.bg_float },
 		CursorLineNr = { fg = c.cyan_neon, bold = true },
-		LineNr = { fg = c.ui_line_nr }, -- Ciemny, zgaszony kolor
-
+		LineNr = { fg = c.ui_line_nr },
 		SignColumn = { bg = bg },
 		VertSplit = { fg = c.ui_border, bg = c.none },
 		WinSeparator = { fg = c.ui_border, bg = c.none },
 
-		-- Wyszukiwanie: Kontrastowe, ale eleganckie
 		Visual = { bg = c.bg_visual },
 		Search = { fg = c.bg_main, bg = c.amber_bright, bold = true },
 		IncSearch = { fg = c.bg_main, bg = c.cyan_neon },
 
-		Pmenu = { fg = c.fg_dim, bg = c.bg_float }, -- Menu nieaktywne jest przygaszone
-		PmenuSel = { fg = c.bg_main, bg = c.green_bio, bold = true }, -- Aktywne świeci
+		Pmenu = { fg = c.fg_dim, bg = c.bg_float },
+		PmenuSel = { fg = c.bg_main, bg = c.green_bio, bold = true },
+		PmenuSbar = { bg = c.bg_float },
+		PmenuThumb = { bg = c.ui_border },
 
-		-- --- HIERARCHIA KODU (THE CLEANUP) ---
+		-- SEMANTICS (Cleanup)
+		Comment = { fg = c.ui_line_nr, italic = opts.italics.comments },
+		Delimiter = { fg = c.ui_line_nr },
+		Operator = { fg = c.blue_deep },
+		Punctuation = { fg = c.ui_line_nr },
 
-		-- 1. WARSTWA NIEWIDZIALNA (Noise Reduction)
-		-- To jest ta zmiana, o którą prosiłeś.
-		-- Operatory, kropki, średniki, nawiasy są w kolorze 'sonar_grey' lub 'blue_deep'.
-		-- Są ciemniejsze niż główny tekst. Nie wybijają się.
-		Comment = { fg = c.ui_line_nr, italic = opts.italics.comments }, -- Komentarze bardzo ciemne
-		Delimiter = { fg = c.ui_line_nr }, -- () {} [] - ciemne, prawie jak tło
-		Operator = { fg = c.blue_deep }, -- = + - * : ? - ciemny morski, nie świeci!
-		Punctuation = { fg = c.ui_line_nr }, -- . , ;
-
-		-- 2. WARSTWA WODY (Structure)
-		-- Słowa kluczowe. Widoczne, ale chłodne i spokojne.
 		Keyword = { fg = c.blue_haze, italic = opts.italics.keywords },
-		Statement = { fg = c.blue_haze }, -- if, else
+		Statement = { fg = c.blue_haze },
 		Conditional = { fg = c.blue_haze },
-		Repeat = { fg = c.blue_haze }, -- for, while
-		Exception = { fg = c.error }, -- try, catch (wyjątek: błędy widać)
-		Include = { fg = c.blue_haze }, -- import
+		Repeat = { fg = c.blue_haze },
+		Include = { fg = c.blue_haze },
+		Exception = { fg = c.error },
 
-		-- 3. WARSTWA PIANY (Content)
-		-- Zmienne. Czysta, jasna biel.
 		Identifier = { fg = c.fg_main },
 
-		-- 4. WARSTWA ŻYCIA (Action)
-		-- Funkcje. Neonowa zieleń. To one napędzają kod.
 		Function = { fg = c.green_bio, bold = opts.bold.functions },
 		Method = { fg = c.green_bio, bold = opts.bold.functions },
 
-		-- 5. WARSTWA SKARBU (Data)
-		-- Bursztyn. Najjaśniejszy punkt.
+		Type = { fg = c.cyan_neon, bold = opts.bold.types },
+		Structure = { fg = c.cyan_neon },
+		Constructor = { fg = c.cyan_neon },
+
 		String = { fg = c.amber_bright, italic = opts.italics.strings },
 		Number = { fg = c.amber_dark },
 		Boolean = { fg = c.amber_dark, bold = true },
 		Constant = { fg = c.amber_dark },
 
-		-- Typy i Klasy (Neonowy Cyjan - Technologia)
-		Type = { fg = c.cyan_neon, bold = opts.bold.types },
-		Structure = { fg = c.cyan_neon }, -- interface, struct
-		Constructor = { fg = c.cyan_neon },
+		Special = { fg = c.cyan_neon },
+		PreProc = { fg = c.blue_haze },
 
-		-- --- TREESITTER (PRECYZJA) ---
-
-		-- Wyciemnianie interpunkcji w Treesitterze (Kluczowe!)
-		["@punctuation.delimiter"] = { fg = c.ui_line_nr }, -- , ; .
-		["@punctuation.bracket"] = { fg = c.ui_line_nr }, -- () {} []
-		["@operator"] = { fg = c.blue_deep }, -- === !== || &&
-
-		-- Zmienne i Parametry
+		-- TREESITTER
+		["@punctuation.delimiter"] = { fg = c.ui_line_nr },
+		["@punctuation.bracket"] = { fg = c.ui_line_nr },
+		["@operator"] = { fg = c.blue_deep },
 		["@variable"] = { fg = c.fg_main },
-		["@variable.builtin"] = { fg = c.cyan_neon, italic = true }, -- this
-		["@parameter"] = { fg = c.fg_main, italic = true }, -- parametry odróżniamy tylko kursywą
-		["@property"] = { fg = c.fg_main }, -- w JS obj.prop - prop jest biały (czystość)
-
-		-- HTML / JSX / TSX
-		-- Tagi: Struktura (Woda), Atrybuty: Przygaszone, Znaki: Ciemne
-		["@tag"] = { fg = c.blue_haze }, -- <div
-		["@tag.attribute"] = { fg = c.fg_dim, italic = true }, -- className (szare, nieistotne)
-		["@tag.delimiter"] = { fg = c.ui_line_nr }, -- > (ciemne!)
-
-		-- JSON (Tu klucze są ważne, więc cyjan)
+		["@variable.builtin"] = { fg = c.cyan_neon, italic = true },
+		["@parameter"] = { fg = c.fg_main, italic = true },
+		["@property"] = { fg = c.fg_main },
+		["@tag"] = { fg = c.blue_haze },
+		["@tag.attribute"] = { fg = c.fg_dim, italic = true },
+		["@tag.delimiter"] = { fg = c.ui_line_nr },
 		["@property.json"] = { fg = c.cyan_neon },
-
-		-- Markdown (Dokumentacja)
-		["@text.literal"] = { fg = c.amber_bright }, -- code blocks
-		["@text.strong"] = { bold = true },
-		["@text.emphasis"] = { italic = true },
+		["@keyword.return"] = { fg = c.error, bold = true },
 
 		-- DIAGNOSTICS & GIT
 		DiagnosticError = { fg = c.error },
 		DiagnosticWarn = { fg = c.warning },
 		DiagnosticInfo = { fg = c.info },
 		DiagnosticHint = { fg = c.ui_line_nr },
-
 		GitSignsAdd = { fg = c.green_bio },
 		GitSignsChange = { fg = c.warning },
 		GitSignsDelete = { fg = c.error },
-
-		BufferLineFill = { fg = c.fg_dim, bg = bg },
-
-		-- 2. TŁO KARTY NIEAKTYWNEJ (To zazwyczaj było szare)
-		-- Teraz wymuszamy 'bg', więc karta zlewa się z tłem.
-		BufferLineBackground = { fg = c.sonar_grey, bg = bg },
-
-		-- 3. TŁO KARTY AKTYWNEJ
-		BufferLineBufferSelected = { fg = c.fg_main, bg = bg, bold = true, italic = false },
-		BufferLineBufferVisible = { fg = c.fg_dim, bg = bg },
-
-		-- 4. SEPARATORY (To one często tworzą szare paski)
-		-- Muszą mieć tło 'bg', żeby zniknęły.
-		BufferLineSeparator = { fg = bg, bg = bg },
-		BufferLineSeparatorSelected = { fg = bg, bg = bg },
-		BufferLineSeparatorVisible = { fg = bg, bg = bg },
-
-		-- 5. WSKAŹNIK (Indicator)
-		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = bg },
-		BufferLineIndicatorVisible = { fg = bg, bg = bg },
-
-		-- 6. PRZYCISKI ZAMKNIĘCIA (Close Icons)
-		BufferLineCloseButton = { fg = c.sonar_grey, bg = bg },
-		BufferLineCloseButtonSelected = { fg = c.error, bg = bg },
-		BufferLineCloseButtonVisible = { fg = c.sonar_grey, bg = bg },
-
-		-- 7. IKONY MODYFIKACJI (Kropka gdy plik niezapisany)
-		BufferLineModified = { fg = c.amber_dark, bg = bg },
-		BufferLineModifiedSelected = { fg = c.amber_bright, bg = bg, bold = true },
-		BufferLineModifiedVisible = { fg = c.amber_dark, bg = bg },
-
-		-- 8. DIAGNOSTYKA (Błędy na pasku)
-		BufferLineError = { fg = c.error, bg = bg },
-		BufferLineErrorSelected = { fg = c.error, bg = bg, bold = true, italic = true },
-		BufferLineErrorDiagnostic = { fg = c.error, bg = bg },
-
-		BufferLineWarning = { fg = c.warning, bg = bg },
-		BufferLineWarningSelected = { fg = c.warning, bg = bg, bold = true, italic = true },
-		BufferLineWarningDiagnostic = { fg = c.warning, bg = bg },
-
-		BufferLineInfo = { fg = c.info, bg = bg },
-		BufferLineInfoSelected = { fg = c.info, bg = bg, bold = true, italic = true },
-		BufferLineInfoDiagnostic = { fg = c.info, bg = bg },
-
-		BufferLineHint = { fg = c.fg_dim, bg = bg },
-		BufferLineHintSelected = { fg = c.fg_dim, bg = bg, bold = true, italic = true },
-		BufferLineHintDiagnostic = { fg = c.fg_dim, bg = bg },
-
-		-- 9. TABLICA (Tabs - jeśli używasz tabów zamiast bufferów)
-		BufferLineTab = { fg = c.sonar_grey, bg = bg },
-		BufferLineTabSelected = { fg = c.fg_main, bg = bg, bold = true },
-		BufferLineTabClose = { fg = c.error, bg = bg },
-
-		-- 10. Offset (np. NvimTree)
-		BufferLineOffsetSeparator = { fg = c.ui_border, bg = bg },
 	}
 
+	-- 2. INTEGRACJE (Tu ładujemy Bufferline)
+	-- Sprawdzamy, czy plik istnieje, by uniknąć błędów
+	local status_ok, bufferline_integration = pcall(require, "baltica.integrations.bufferline")
+	if status_ok then
+		local bufferline_groups = bufferline_integration.get(c, bg)
+		-- Łączymy tabele
+		for group, opts in pairs(bufferline_groups) do
+			groups[group] = opts
+		end
+	end
+
+	-- 3. APLIKOWANIE WSZYSTKIEGO
 	for group, parameters in pairs(groups) do
 		vim.api.nvim_set_hl(0, group, parameters)
 	end
