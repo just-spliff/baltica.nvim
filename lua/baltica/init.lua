@@ -1,9 +1,11 @@
 local M = {}
-local config = require("baltica.config")
-local highlights = require("baltica.highlights")
+
+M.config = require("baltica.config")
+M.palette = require("baltica.palette")
+M.highlights = require("baltica.highlights")
 
 function M.setup(opts)
-	config.setup(opts)
+	M.config.setup(opts)
 end
 
 function M.load()
@@ -14,7 +16,17 @@ function M.load()
 	vim.o.termguicolors = true
 	vim.g.colors_name = "baltica"
 
-	highlights.setup(config)
+	-- Pobieramy kolory i opcje
+	local colors = M.palette.colors
+	local config = M.config.options
+
+	-- Generujemy highlighty
+	local groups = M.highlights.setup(colors, config)
+
+	-- Aplikujemy highlighty
+	for group, settings in pairs(groups) do
+		vim.api.nvim_set_hl(0, group, settings)
+	end
 end
 
 return M

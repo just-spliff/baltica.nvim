@@ -1,121 +1,112 @@
 local M = {}
 
-function M.setup(config)
-	local c = require("baltica.palette").colors
-	local opts = config.options
+function M.setup(c, opts)
+	-- 1. Logika tła (Tokyonight Style)
 	local transparent = opts.transparent_background
+	local bg = transparent and c.none or c.bg_main
+	local bg_float = transparent and c.none or c.bg_float
 
-	-- 1. DEFINICJA TŁA (Sztywna logika)
-	local bg_editor, bg_float, fill_color
+	-- Dla bufferline: jeśli transparent to "NONE", jeśli nie to bg_main
+	local bg_bar = transparent and c.none or c.bg_main
 
-	if transparent then
-		bg_editor = "NONE"
-		bg_float = "NONE"
-		fill_color = "NONE" -- To gwarantuje przezroczystość paska
-	else
-		bg_editor = c.bg_main
-		bg_float = c.bg_float
-		fill_color = c.bg_main -- To gwarantuje Deep Petrol
+	local theme = {}
+
+	-- Funkcja pomocnicza do dodawania grup
+	local function hl(group, styles)
+		theme[group] = styles
 	end
 
-	local groups = {
-		-- UI
-		Normal = { fg = c.fg_main, bg = bg_editor },
-		NormalNC = { fg = c.fg_main, bg = bg_editor },
-		NormalFloat = { fg = c.fg_main, bg = bg_float },
-		FloatBorder = { fg = c.ui_border, bg = bg_float },
+	-- --- UI BASE ---
+	hl("Normal", { fg = c.fg_main, bg = bg })
+	hl("NormalNC", { fg = c.fg_main, bg = bg })
+	hl("NormalFloat", { fg = c.fg_main, bg = bg_float })
+	hl("FloatBorder", { fg = c.ui_border, bg = bg_float })
 
-		Cursor = { fg = c.bg_main, bg = c.ui_cursor },
-		CursorLine = { bg = c.bg_float },
-		CursorLineNr = { fg = c.cyan_neon, bold = true },
-		LineNr = { fg = c.ui_line_nr },
-		SignColumn = { bg = bg_editor },
+	hl("Cursor", { fg = c.bg_main, bg = c.ui_cursor })
+	hl("CursorLine", { bg = c.bg_float })
+	hl("CursorLineNr", { fg = c.cyan_neon, bold = true })
+	hl("LineNr", { fg = c.ui_line_nr })
 
-		-- Separatory okien (ważne przy przezroczystości)
-		VertSplit = { fg = c.ui_border, bg = "NONE" },
-		WinSeparator = { fg = c.ui_border, bg = "NONE" },
+	hl("SignColumn", { bg = bg })
+	hl("VertSplit", { fg = c.ui_border, bg = c.none })
+	hl("WinSeparator", { fg = c.ui_border, bg = c.none })
 
-		Visual = { bg = c.bg_visual or "#10333B" },
-		Search = { fg = c.bg_main, bg = c.amber_bright, bold = true },
+	hl("Visual", { bg = c.bg_visual or "#10333B" })
+	hl("Search", { fg = c.bg_main, bg = c.amber_bright, bold = true })
 
-		Pmenu = { fg = c.fg_dim, bg = c.bg_float },
-		PmenuSel = { fg = c.bg_main, bg = c.green_bio, bold = true },
+	hl("Pmenu", { fg = c.fg_dim, bg = c.bg_float })
+	hl("PmenuSel", { fg = c.bg_main, bg = c.green_bio, bold = true })
+	hl("PmenuSbar", { bg = c.bg_float })
+	hl("PmenuThumb", { bg = c.ui_border })
 
-		-- SYNTAX
-		Comment = { fg = c.ui_line_nr, italic = opts.italics.comments },
-		Delimiter = { fg = c.blue_deep },
-		Operator = { fg = c.blue_deep },
+	-- --- SYNTAX ---
+	hl("Comment", { fg = c.ui_line_nr, italic = opts.italics.comments })
+	hl("Delimiter", { fg = c.blue_deep })
+	hl("Operator", { fg = c.blue_deep })
+	hl("Keyword", { fg = c.blue_haze, italic = opts.italics.keywords })
+	hl("Statement", { fg = c.blue_haze })
+	hl("Conditional", { fg = c.blue_haze })
+	hl("Repeat", { fg = c.blue_haze })
+	hl("Include", { fg = c.blue_haze })
+	hl("Function", { fg = c.green_bio, bold = opts.bold.functions })
+	hl("Identifier", { fg = c.fg_main })
+	hl("String", { fg = c.amber_bright, italic = opts.italics.strings })
+	hl("Number", { fg = c.amber_dark })
+	hl("Boolean", { fg = c.amber_dark, bold = true })
+	hl("Type", { fg = c.cyan_neon, bold = opts.bold.types })
 
-		Keyword = { fg = c.blue_haze, italic = opts.italics.keywords },
-		Statement = { fg = c.blue_haze },
-		Conditional = { fg = c.blue_haze },
-		Repeat = { fg = c.blue_haze },
-		Include = { fg = c.blue_haze },
+	-- --- TREESITTER ---
+	hl("@variable", { fg = c.fg_main })
+	hl("@function", { fg = c.green_bio, bold = opts.bold.functions })
+	hl("@keyword.return", { fg = c.error, bold = true })
+	hl("@tag", { fg = c.blue_haze })
+	hl("@tag.attribute", { fg = c.fg_dim, italic = true })
+	hl("@tag.delimiter", { fg = c.ui_line_nr })
+	hl("@punctuation.delimiter", { fg = c.ui_line_nr })
+	hl("@punctuation.bracket", { fg = c.ui_line_nr })
 
-		Identifier = { fg = c.fg_main },
-		Function = { fg = c.green_bio, bold = opts.bold.functions },
-		Type = { fg = c.cyan_neon, bold = opts.bold.types },
+	-- --- DIAGNOSTICS ---
+	hl("DiagnosticError", { fg = c.error })
+	hl("DiagnosticWarn", { fg = c.warning })
+	hl("DiagnosticInfo", { fg = c.info })
+	hl("DiagnosticHint", { fg = c.ui_line_nr })
 
-		String = { fg = c.amber_bright, italic = opts.italics.strings },
-		Number = { fg = c.amber_dark },
-		Boolean = { fg = c.amber_dark, bold = true },
-		Constant = { fg = c.amber_dark },
+	hl("GitSignsAdd", { fg = c.green_bio })
+	hl("GitSignsChange", { fg = c.warning })
+	hl("GitSignsDelete", { fg = c.error })
 
-		Special = { fg = c.cyan_neon },
-		PreProc = { fg = c.blue_haze },
+	-- =================================================================
+	-- BUFFERLINE INTEGRATION (Tokyonight Style)
+	-- =================================================================
+	-- Klucz: Używamy bg_bar, które jest albo NONE albo kolorem tła.
 
-		-- TREESITTER
-		["@variable"] = { fg = c.fg_main },
-		["@punctuation.delimiter"] = { fg = c.ui_line_nr },
-		["@punctuation.bracket"] = { fg = c.ui_line_nr },
-		["@tag"] = { fg = c.blue_haze },
-		["@tag.attribute"] = { fg = c.fg_dim, italic = true },
-		["@tag.delimiter"] = { fg = c.ui_line_nr },
+	hl("BufferLineFill", { bg = bg_bar })
+	hl("BufferLineBackground", { fg = c.ui_line_nr, bg = bg_bar })
 
-		-- =========================================================
-		-- BUFFERLINE FIX
-		-- =========================================================
+	hl("BufferLineBufferSelected", { fg = c.fg_main, bg = bg_bar, bold = true })
+	hl("BufferLineBufferVisible", { fg = c.fg_dim, bg = bg_bar })
 
-		-- TŁO PASKA (FILL)
-		-- Jeśli fill_color="NONE", pasek zniknie.
-		BufferLineFill = { bg = fill_color },
+	hl("BufferLineSeparator", { fg = bg_bar, bg = bg_bar })
+	hl("BufferLineSeparatorSelected", { fg = bg_bar, bg = bg_bar })
+	hl("BufferLineSeparatorVisible", { fg = bg_bar, bg = bg_bar })
 
-		-- KARTA NIEAKTYWNA
-		BufferLineBackground = { fg = c.ui_line_nr, bg = fill_color },
+	hl("BufferLineIndicatorSelected", { fg = c.amber_bright, bg = bg_bar })
+	hl("BufferLineIndicatorVisible", { fg = bg_bar, bg = bg_bar })
 
-		-- KARTA AKTYWNA
-		-- Tekst jasny, tło takie samo jak Fill (żeby było płasko/przezroczysto)
-		BufferLineBufferSelected = { fg = c.fg_main, bg = fill_color, bold = true },
-		BufferLineBufferVisible = { fg = c.fg_dim, bg = fill_color },
+	hl("BufferLineCloseButton", { fg = c.ui_line_nr, bg = bg_bar })
+	hl("BufferLineCloseButtonSelected", { fg = c.error, bg = bg_bar })
 
-		-- SEPARATORY (Klucz do zniknięcia "kresek")
-		BufferLineSeparator = { fg = fill_color, bg = fill_color },
-		BufferLineSeparatorSelected = { fg = fill_color, bg = fill_color },
-		BufferLineSeparatorVisible = { fg = fill_color, bg = fill_color },
+	hl("BufferLineModified", { fg = c.amber_dark, bg = bg_bar })
+	hl("BufferLineModifiedSelected", { fg = c.amber_bright, bg = bg_bar, bold = true })
 
-		-- WSKAŹNIK (Tylko on ma kolor)
-		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = fill_color },
-		BufferLineIndicatorVisible = { fg = fill_color, bg = fill_color },
+	hl("BufferLineError", { fg = c.error, bg = bg_bar })
+	hl("BufferLineErrorDiagnostic", { fg = c.error, bg = bg_bar })
+	hl("BufferLineWarning", { fg = c.warning, bg = bg_bar })
+	hl("BufferLineWarningDiagnostic", { fg = c.warning, bg = bg_bar })
 
-		-- IKONY I PRZYCISKI
-		BufferLineCloseButton = { fg = c.ui_line_nr, bg = fill_color },
-		BufferLineCloseButtonSelected = { fg = c.error, bg = fill_color },
-		BufferLineModified = { fg = c.amber_dark, bg = fill_color },
-		BufferLineModifiedSelected = { fg = c.amber_bright, bg = fill_color, bold = true },
+	hl("BufferLineOffsetSeparator", { fg = c.ui_border, bg = bg_bar })
 
-		-- DIAGNOSTYKA
-		BufferLineError = { fg = c.error, bg = fill_color },
-		BufferLineErrorDiagnostic = { fg = c.error, bg = fill_color },
-		BufferLineWarning = { fg = c.warning, bg = fill_color },
-		BufferLineWarningDiagnostic = { fg = c.warning, bg = fill_color },
-
-		-- OFFSET
-		BufferLineOffsetSeparator = { fg = c.ui_border, bg = fill_color },
-	}
-
-	for group, parameters in pairs(groups) do
-		vim.api.nvim_set_hl(0, group, parameters)
-	end
+	return theme
 end
 
 return M
