@@ -4,23 +4,17 @@ function M.setup(config)
 	local c = require("baltica.palette").colors
 	local opts = config.options
 
-	-- 1. LOGIKA PRZEZROCZYSTOŚCI
-	-- To jest kluczowe.
-	-- bg_editor: To tło dla zwykłego kodu.
-	-- bg_bufferline: To tło SPECIFICZNIE dla paska zakładek.
-
 	local transparent = opts.transparent_background
-	local bg_editor = transparent and c.none or c.bg_main
+
+	local bg = transparent and c.none or c.bg_main
 	local bg_float = transparent and c.none or c.bg_float
 
-	-- Jeśli transparent=true, to bufferline ma być "NONE".
-	-- Jeśli false, to ma być "Deep Petrol" (#01161B).
 	local bg_bufferline = transparent and c.none or "#01161B"
 
 	local groups = {
 		-- --- UI ---
-		Normal = { fg = c.fg_main, bg = bg_editor },
-		NormalNC = { fg = c.fg_main, bg = bg_editor },
+		Normal = { fg = c.fg_main, bg = bg },
+		NormalNC = { fg = c.fg_main, bg = bg },
 		NormalFloat = { fg = c.fg_main, bg = bg_float },
 		FloatBorder = { fg = c.ui_border, bg = bg_float },
 
@@ -29,7 +23,7 @@ function M.setup(config)
 		CursorLineNr = { fg = c.cyan_neon, bold = true },
 		LineNr = { fg = c.ui_line_nr },
 
-		SignColumn = { bg = bg_editor },
+		SignColumn = { bg = bg },
 		VertSplit = { fg = c.ui_border, bg = c.none },
 		WinSeparator = { fg = c.ui_border, bg = c.none },
 
@@ -56,6 +50,7 @@ function M.setup(config)
 		Exception = { fg = c.error },
 
 		Identifier = { fg = c.fg_main },
+
 		Function = { fg = c.green_bio, bold = opts.bold.functions },
 		Method = { fg = c.green_bio, bold = opts.bold.functions },
 		Type = { fg = c.cyan_neon, bold = opts.bold.types },
@@ -94,35 +89,26 @@ function M.setup(config)
 		GitSignsDelete = { fg = c.error },
 
 		-- =========================================================
-		-- BUFFERLINE: TRANSPARENT & SEAMLESS FIX
+		-- BUFFERLINE: TRANSPARENT FIX
 		-- =========================================================
-		-- Tutaj używamy zmiennej 'bg_bufferline'.
-		-- Jeśli transparent=true, to jest "NONE".
-		-- Jeśli transparent=false, to jest "#01161B".
+		-- Wszystkie tła ustawiamy na 'bg_bufferline'.
 
-		-- 1. FILL (Puste miejsce po prawej)
+		-- 1. FILL (Tło paska)
 		BufferLineFill = { bg = bg_bufferline },
 
 		-- 2. KARTA NIEAKTYWNA
-		-- Tło ustawiamy na bg_bufferline.
-		-- Tekst przygaszony.
 		BufferLineBackground = { fg = c.ui_line_nr, bg = bg_bufferline },
 
-		-- 3. KARTA AKTYWNA
-		-- Tło również bg_bufferline (dzięki temu jest przezroczyste/płaskie).
-		-- Wyróżniamy tylko jasnym tekstem i boldem.
+		-- 3. KARTA AKTYWNA (Wyróżniamy tekstem)
 		BufferLineBufferSelected = { fg = c.fg_main, bg = bg_bufferline, bold = true },
 		BufferLineBufferVisible = { fg = c.fg_dim, bg = bg_bufferline },
 
-		-- 4. SEPARATORY
-		-- Ustawiamy FG i BG na bg_bufferline.
-		-- W trybie transparent: są niewidoczne (NONE).
-		-- W trybie solid: są niewidoczne (zlewają się z tłem).
+		-- 4. SEPARATORY (Znikają w tle)
 		BufferLineSeparator = { fg = bg_bufferline, bg = bg_bufferline },
 		BufferLineSeparatorSelected = { fg = bg_bufferline, bg = bg_bufferline },
 		BufferLineSeparatorVisible = { fg = bg_bufferline, bg = bg_bufferline },
 
-		-- 5. WSKAŹNIK (Bursztynowa kreska)
+		-- 5. WSKAŹNIK
 		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = bg_bufferline },
 		BufferLineIndicatorVisible = { fg = bg_bufferline, bg = bg_bufferline },
 
@@ -141,7 +127,7 @@ function M.setup(config)
 		BufferLineWarning = { fg = c.warning, bg = bg_bufferline },
 		BufferLineWarningDiagnostic = { fg = c.warning, bg = bg_bufferline },
 
-		-- 8. OFFSET (NvimTree)
+		-- 8. OFFSET
 		BufferLineOffsetSeparator = { fg = c.ui_border, bg = bg_bufferline },
 	}
 
