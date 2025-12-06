@@ -15,6 +15,14 @@ function M.load()
 	vim.o.termguicolors = true
 	vim.g.colors_name = "baltica"
 
+	vim.api.nvim_create_autocmd("ColorScheme", {
+		callback = function()
+			-- Wymuś kolor #01161B na grupie FILL
+			vim.api.nvim_set_hl(0, "BufferLineFill", { bg = "#01161B", fg = "#01161B" })
+			vim.api.nvim_set_hl(0, "BufferLineBackground", { bg = "#01161B", fg = "#456a70" })
+		end,
+	})
+
 	highlights.setup(config)
 
 	local c = palette.colors
