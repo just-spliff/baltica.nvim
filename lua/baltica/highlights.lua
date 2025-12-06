@@ -110,47 +110,59 @@ function M.setup(config)
 		GitSignsChange = { fg = c.warning },
 		GitSignsDelete = { fg = c.error },
 
-		-- Musi być idealnie takie samo jak tło edytora.
-		BufferLineFill = { bg = bg },
+		BufferLineFill = { fg = c.fg_dim, bg = bg },
 
-		-- 2. KARTA NIEAKTYWNA
-		-- Kluczowa zmiana: Zmieniamy tło z 'bg_float' na 'bg'.
-		-- Teraz nieaktywne karty nie mają "szarego tła", są płaskie.
-		-- Odróżniamy je tym, że tekst jest przygaszony (fg_dim).
-		BufferLineBackground = { fg = c.fg_dim, bg = bg },
+		-- 2. TŁO KARTY NIEAKTYWNEJ (To zazwyczaj było szare)
+		-- Teraz wymuszamy 'bg', więc karta zlewa się z tłem.
+		BufferLineBackground = { fg = c.sonar_grey, bg = bg },
 
-		-- 3. KARTA AKTYWNA
-		-- Też ma tło 'bg', ale tekst jest jasny i pogrubiony.
+		-- 3. TŁO KARTY AKTYWNEJ
 		BufferLineBufferSelected = { fg = c.fg_main, bg = bg, bold = true, italic = false },
+		BufferLineBufferVisible = { fg = c.fg_dim, bg = bg },
 
-		-- 4. SEPARATORY (Style: Thin/Thick/Slant)
-		-- Ustawiamy wszystko na 'bg', żeby "zniknęły" i nie tworzyły kresek.
-		-- Dzięki temu karty wyglądają jak tekst lewitujący na pasku.
+		-- 4. SEPARATORY (To one często tworzą szare paski)
+		-- Muszą mieć tło 'bg', żeby zniknęły.
 		BufferLineSeparator = { fg = bg, bg = bg },
 		BufferLineSeparatorSelected = { fg = bg, bg = bg },
+		BufferLineSeparatorVisible = { fg = bg, bg = bg },
 
 		-- 5. WSKAŹNIK (Indicator)
-		-- To jedyny element kolorystyczny - bursztynowa kreska przy aktywnej karcie.
 		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = bg },
+		BufferLineIndicatorVisible = { fg = bg, bg = bg },
 
-		-- 6. POZOSTAŁE ELEMENTY
-		-- Przyciski zamknięcia i modyfikacje - wszystko na tle 'bg'.
-		BufferLineCloseButton = { fg = c.fg_dim, bg = bg },
+		-- 6. PRZYCISKI ZAMKNIĘCIA (Close Icons)
+		BufferLineCloseButton = { fg = c.sonar_grey, bg = bg },
 		BufferLineCloseButtonSelected = { fg = c.error, bg = bg },
+		BufferLineCloseButtonVisible = { fg = c.sonar_grey, bg = bg },
 
+		-- 7. IKONY MODYFIKACJI (Kropka gdy plik niezapisany)
 		BufferLineModified = { fg = c.amber_dark, bg = bg },
 		BufferLineModifiedSelected = { fg = c.amber_bright, bg = bg, bold = true },
+		BufferLineModifiedVisible = { fg = c.amber_dark, bg = bg },
 
-		-- Diagnostyka
+		-- 8. DIAGNOSTYKA (Błędy na pasku)
 		BufferLineError = { fg = c.error, bg = bg },
-		BufferLineErrorDiagnostic = { fg = c.error, bg = bg },
 		BufferLineErrorSelected = { fg = c.error, bg = bg, bold = true, italic = true },
+		BufferLineErrorDiagnostic = { fg = c.error, bg = bg },
 
-		-- Numery (jeśli włączone)
-		BufferLineNumbers = { fg = c.ui_line_nr, bg = bg },
-		BufferLineNumbersSelected = { fg = c.cyan_neon, bg = bg, bold = true },
+		BufferLineWarning = { fg = c.warning, bg = bg },
+		BufferLineWarningSelected = { fg = c.warning, bg = bg, bold = true, italic = true },
+		BufferLineWarningDiagnostic = { fg = c.warning, bg = bg },
 
-		-- Offset (np. dla NvimTree)
+		BufferLineInfo = { fg = c.info, bg = bg },
+		BufferLineInfoSelected = { fg = c.info, bg = bg, bold = true, italic = true },
+		BufferLineInfoDiagnostic = { fg = c.info, bg = bg },
+
+		BufferLineHint = { fg = c.fg_dim, bg = bg },
+		BufferLineHintSelected = { fg = c.fg_dim, bg = bg, bold = true, italic = true },
+		BufferLineHintDiagnostic = { fg = c.fg_dim, bg = bg },
+
+		-- 9. TABLICA (Tabs - jeśli używasz tabów zamiast bufferów)
+		BufferLineTab = { fg = c.sonar_grey, bg = bg },
+		BufferLineTabSelected = { fg = c.fg_main, bg = bg, bold = true },
+		BufferLineTabClose = { fg = c.error, bg = bg },
+
+		-- 10. Offset (np. NvimTree)
 		BufferLineOffsetSeparator = { fg = c.ui_border, bg = bg },
 	}
 
