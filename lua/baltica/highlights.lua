@@ -109,42 +109,49 @@ function M.setup(config)
 		GitSignsAdd = { fg = c.green_bio },
 		GitSignsChange = { fg = c.warning },
 		GitSignsDelete = { fg = c.error },
+
+		-- Musi być idealnie takie samo jak tło edytora.
 		BufferLineFill = { bg = bg },
 
-		-- Karta NIEAKTYWNA
-		-- Używamy 'bg_float'. Jeśli transparency=true, to też będzie NONE,
-		-- więc tekst będzie po prostu "wisiał" w powietrzu (bardzo nowoczesne).
-		BufferLineBackground = { fg = c.fg_dim, bg = bg_float },
+		-- 2. KARTA NIEAKTYWNA
+		-- Kluczowa zmiana: Zmieniamy tło z 'bg_float' na 'bg'.
+		-- Teraz nieaktywne karty nie mają "szarego tła", są płaskie.
+		-- Odróżniamy je tym, że tekst jest przygaszony (fg_dim).
+		BufferLineBackground = { fg = c.fg_dim, bg = bg },
 
-		-- Karta AKTYWNA
-		-- Ma to samo tło co edytor (bg), więc wizualnie "łączy się" z kodem poniżej.
+		-- 3. KARTA AKTYWNA
+		-- Też ma tło 'bg', ale tekst jest jasny i pogrubiony.
 		BufferLineBufferSelected = { fg = c.fg_main, bg = bg, bold = true, italic = false },
 
-		-- Wskaźnik (Indicator) - Bursztyn
+		-- 4. SEPARATORY (Style: Thin/Thick/Slant)
+		-- Ustawiamy wszystko na 'bg', żeby "zniknęły" i nie tworzyły kresek.
+		-- Dzięki temu karty wyglądają jak tekst lewitujący na pasku.
+		BufferLineSeparator = { fg = bg, bg = bg },
+		BufferLineSeparatorSelected = { fg = bg, bg = bg },
+
+		-- 5. WSKAŹNIK (Indicator)
+		-- To jedyny element kolorystyczny - bursztynowa kreska przy aktywnej karcie.
 		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = bg },
 
-		-- Separatory (Kluczowe dla efektu "wycięcia")
-		-- Tło (bg) musi być 'bg' (głównym tłem), żeby zlewało się z Fill.
-		-- Foreground (fg) musi być 'bg_float', żeby stykało się z nieaktywną kartą.
-		BufferLineSeparator = { fg = bg_float, bg = bg },
-		BufferLineSeparatorSelected = { fg = bg_float, bg = bg },
-
-		-- Przycisk zamknięcia
-		BufferLineCloseButton = { fg = c.fg_dim, bg = bg_float },
+		-- 6. POZOSTAŁE ELEMENTY
+		-- Przyciski zamknięcia i modyfikacje - wszystko na tle 'bg'.
+		BufferLineCloseButton = { fg = c.fg_dim, bg = bg },
 		BufferLineCloseButtonSelected = { fg = c.error, bg = bg },
 
-		-- Modyfikacje pliku
-		BufferLineModified = { fg = c.amber_dark, bg = bg_float },
+		BufferLineModified = { fg = c.amber_dark, bg = bg },
 		BufferLineModifiedSelected = { fg = c.amber_bright, bg = bg, bold = true },
 
 		-- Diagnostyka
-		BufferLineError = { fg = c.fg_dim, bg = bg_float },
-		BufferLineErrorDiagnostic = { fg = c.error, bg = bg_float },
+		BufferLineError = { fg = c.error, bg = bg },
+		BufferLineErrorDiagnostic = { fg = c.error, bg = bg },
 		BufferLineErrorSelected = { fg = c.error, bg = bg, bold = true, italic = true },
 
-		-- Opcjonalnie: Numery (jeśli używasz)
-		BufferLineNumbers = { fg = c.ui_line_nr, bg = bg_float },
+		-- Numery (jeśli włączone)
+		BufferLineNumbers = { fg = c.ui_line_nr, bg = bg },
 		BufferLineNumbersSelected = { fg = c.cyan_neon, bg = bg, bold = true },
+
+		-- Offset (np. dla NvimTree)
+		BufferLineOffsetSeparator = { fg = c.ui_border, bg = bg },
 	}
 
 	for group, parameters in pairs(groups) do
