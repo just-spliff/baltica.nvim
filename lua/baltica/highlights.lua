@@ -3,23 +3,25 @@ local M = {}
 function M.setup(config)
 	local c = require("baltica.palette").colors
 	local opts = config.options
+	local transparent = opts.transparent_background
 
-	-- 1. LOGIKA TŁA (Absolutna)
-	local is_transparent = opts.transparent_background
+	-- 1. DEFINICJA TŁA (Sztywna logika)
+	local bg_editor, bg_float, fill_color
 
-	-- Tło edytora: albo NONE albo Deep Petrol
-	local bg = is_transparent and "NONE" or c.bg_main
-	local bg_float = is_transparent and "NONE" or c.bg_float
-
-	-- Tło Bufferline: KLUCZ DO SUKCESU
-	-- Wymuszamy string "NONE", jeśli włączona jest przezroczystość.
-	-- Dzięki temu bufferline na pewno odsłoni tapetę terminala.
-	local bg_bufferline = is_transparent and "NONE" or "#01161B"
+	if transparent then
+		bg_editor = "NONE"
+		bg_float = "NONE"
+		fill_color = "NONE" -- To gwarantuje przezroczystość paska
+	else
+		bg_editor = c.bg_main
+		bg_float = c.bg_float
+		fill_color = c.bg_main -- To gwarantuje Deep Petrol
+	end
 
 	local groups = {
-		-- --- UI ---
-		Normal = { fg = c.fg_main, bg = bg },
-		NormalNC = { fg = c.fg_main, bg = bg },
+		-- UI
+		Normal = { fg = c.fg_main, bg = bg_editor },
+		NormalNC = { fg = c.fg_main, bg = bg_editor },
 		NormalFloat = { fg = c.fg_main, bg = bg_float },
 		FloatBorder = { fg = c.ui_border, bg = bg_float },
 
@@ -27,39 +29,32 @@ function M.setup(config)
 		CursorLine = { bg = c.bg_float },
 		CursorLineNr = { fg = c.cyan_neon, bold = true },
 		LineNr = { fg = c.ui_line_nr },
+		SignColumn = { bg = bg_editor },
 
-		SignColumn = { bg = bg },
+		-- Separatory okien (ważne przy przezroczystości)
 		VertSplit = { fg = c.ui_border, bg = "NONE" },
 		WinSeparator = { fg = c.ui_border, bg = "NONE" },
 
-		Visual = { bg = c.bg_visual },
+		Visual = { bg = c.bg_visual or "#10333B" },
 		Search = { fg = c.bg_main, bg = c.amber_bright, bold = true },
-		IncSearch = { fg = c.bg_main, bg = c.cyan_neon },
 
 		Pmenu = { fg = c.fg_dim, bg = c.bg_float },
 		PmenuSel = { fg = c.bg_main, bg = c.green_bio, bold = true },
-		PmenuSbar = { bg = c.bg_float },
-		PmenuThumb = { bg = c.ui_border },
 
-		-- --- SYNTAX ---
+		-- SYNTAX
 		Comment = { fg = c.ui_line_nr, italic = opts.italics.comments },
-		Delimiter = { fg = c.ui_line_nr },
+		Delimiter = { fg = c.blue_deep },
 		Operator = { fg = c.blue_deep },
-		Punctuation = { fg = c.ui_line_nr },
 
 		Keyword = { fg = c.blue_haze, italic = opts.italics.keywords },
 		Statement = { fg = c.blue_haze },
 		Conditional = { fg = c.blue_haze },
 		Repeat = { fg = c.blue_haze },
 		Include = { fg = c.blue_haze },
-		Exception = { fg = c.error },
 
 		Identifier = { fg = c.fg_main },
 		Function = { fg = c.green_bio, bold = opts.bold.functions },
-		Method = { fg = c.green_bio, bold = opts.bold.functions },
 		Type = { fg = c.cyan_neon, bold = opts.bold.types },
-		Structure = { fg = c.cyan_neon },
-		Constructor = { fg = c.cyan_neon },
 
 		String = { fg = c.amber_bright, italic = opts.italics.strings },
 		Number = { fg = c.amber_dark },
@@ -70,70 +65,52 @@ function M.setup(config)
 		PreProc = { fg = c.blue_haze },
 
 		-- TREESITTER
+		["@variable"] = { fg = c.fg_main },
 		["@punctuation.delimiter"] = { fg = c.ui_line_nr },
 		["@punctuation.bracket"] = { fg = c.ui_line_nr },
-		["@operator"] = { fg = c.blue_deep },
-		["@variable"] = { fg = c.fg_main },
-		["@variable.builtin"] = { fg = c.cyan_neon, italic = true },
-		["@parameter"] = { fg = c.fg_main, italic = true },
-		["@property"] = { fg = c.fg_main },
 		["@tag"] = { fg = c.blue_haze },
 		["@tag.attribute"] = { fg = c.fg_dim, italic = true },
 		["@tag.delimiter"] = { fg = c.ui_line_nr },
-		["@property.json"] = { fg = c.cyan_neon },
-		["@keyword.return"] = { fg = c.error, bold = true },
-
-		-- DIAGNOSTICS & GIT
-		DiagnosticError = { fg = c.error },
-		DiagnosticWarn = { fg = c.warning },
-		DiagnosticInfo = { fg = c.info },
-		DiagnosticHint = { fg = c.ui_line_nr },
-		GitSignsAdd = { fg = c.green_bio },
-		GitSignsChange = { fg = c.warning },
-		GitSignsDelete = { fg = c.error },
 
 		-- =========================================================
-		-- BUFFERLINE: TRANSPARENCY FIX
+		-- BUFFERLINE FIX
 		-- =========================================================
 
-		-- 1. FILL (Tło paska)
-		-- To najważniejsza linia. bg_bufferline to albo "NONE" albo "#01161B".
-		BufferLineFill = { bg = bg_bufferline },
+		-- TŁO PASKA (FILL)
+		-- Jeśli fill_color="NONE", pasek zniknie.
+		BufferLineFill = { bg = fill_color },
 
-		-- 2. KARTA NIEAKTYWNA
-		BufferLineBackground = { fg = c.ui_line_nr, bg = bg_bufferline },
+		-- KARTA NIEAKTYWNA
+		BufferLineBackground = { fg = c.ui_line_nr, bg = fill_color },
 
-		-- 3. KARTA AKTYWNA
-		-- Ma to samo tło co Fill (żeby była płaska/przezroczysta), wyróżnia się tekstem.
-		BufferLineBufferSelected = { fg = c.fg_main, bg = bg_bufferline, bold = true },
-		BufferLineBufferVisible = { fg = c.fg_dim, bg = bg_bufferline },
+		-- KARTA AKTYWNA
+		-- Tekst jasny, tło takie samo jak Fill (żeby było płasko/przezroczysto)
+		BufferLineBufferSelected = { fg = c.fg_main, bg = fill_color, bold = true },
+		BufferLineBufferVisible = { fg = c.fg_dim, bg = fill_color },
 
-		-- 4. SEPARATORY (Znikają w tle)
-		BufferLineSeparator = { fg = bg_bufferline, bg = bg_bufferline },
-		BufferLineSeparatorSelected = { fg = bg_bufferline, bg = bg_bufferline },
-		BufferLineSeparatorVisible = { fg = bg_bufferline, bg = bg_bufferline },
+		-- SEPARATORY (Klucz do zniknięcia "kresek")
+		BufferLineSeparator = { fg = fill_color, bg = fill_color },
+		BufferLineSeparatorSelected = { fg = fill_color, bg = fill_color },
+		BufferLineSeparatorVisible = { fg = fill_color, bg = fill_color },
 
-		-- 5. WSKAŹNIK (Bursztyn)
-		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = bg_bufferline },
-		BufferLineIndicatorVisible = { fg = bg_bufferline, bg = bg_bufferline },
+		-- WSKAŹNIK (Tylko on ma kolor)
+		BufferLineIndicatorSelected = { fg = c.amber_bright, bg = fill_color },
+		BufferLineIndicatorVisible = { fg = fill_color, bg = fill_color },
 
-		-- 6. IKONY
-		BufferLineCloseButton = { fg = c.ui_line_nr, bg = bg_bufferline },
-		BufferLineCloseButtonSelected = { fg = c.error, bg = bg_bufferline },
-		BufferLineCloseButtonVisible = { fg = c.ui_line_nr, bg = bg_bufferline },
+		-- IKONY I PRZYCISKI
+		BufferLineCloseButton = { fg = c.ui_line_nr, bg = fill_color },
+		BufferLineCloseButtonSelected = { fg = c.error, bg = fill_color },
+		BufferLineModified = { fg = c.amber_dark, bg = fill_color },
+		BufferLineModifiedSelected = { fg = c.amber_bright, bg = fill_color, bold = true },
 
-		BufferLineModified = { fg = c.amber_dark, bg = bg_bufferline },
-		BufferLineModifiedSelected = { fg = c.amber_bright, bg = bg_bufferline, bold = true },
-		BufferLineModifiedVisible = { fg = c.amber_dark, bg = bg_bufferline },
+		-- DIAGNOSTYKA
+		BufferLineError = { fg = c.error, bg = fill_color },
+		BufferLineErrorDiagnostic = { fg = c.error, bg = fill_color },
+		BufferLineWarning = { fg = c.warning, bg = fill_color },
+		BufferLineWarningDiagnostic = { fg = c.warning, bg = fill_color },
 
-		-- 7. DIAGNOSTYKA
-		BufferLineError = { fg = c.error, bg = bg_bufferline },
-		BufferLineErrorDiagnostic = { fg = c.error, bg = bg_bufferline },
-		BufferLineWarning = { fg = c.warning, bg = bg_bufferline },
-		BufferLineWarningDiagnostic = { fg = c.warning, bg = bg_bufferline },
-
-		-- 8. OFFSET
-		BufferLineOffsetSeparator = { fg = c.ui_border, bg = bg_bufferline },
+		-- OFFSET
+		BufferLineOffsetSeparator = { fg = c.ui_border, bg = fill_color },
 	}
 
 	for group, parameters in pairs(groups) do
